@@ -2715,9 +2715,10 @@
 
                 processedData.forEach((result, index) => {
                     let displayName = result.name;
-                    let groupKey = result.name;
+                    let groupKey = result.name; // Unique key for coloring/grouping logic
 
                     if (groupByName) {
+                        // Strip suffix to group by base name
                         groupKey = result.name.replace(/ \(\d+\)$/, '');
                         displayName = groupKey;
                     }
@@ -2727,16 +2728,25 @@
                         colorIndex++;
                     }
                     const color = colorMap[groupKey];
-                    // If grouping, use same style. If not, vary style?
-                    // User said "same group -> same color and plot shape".
-                    // If we assume different groups have different colors, we can reuse style or vary it.
-                    // Let's vary style by group index.
+
+                    // Style logic:
+                    // If grouping: same group -> same color AND same style.
+                    // If NOT grouping: unique color per dataset (already handled by unique groupKey), style can rotate or be constant.
+                    // To make them distinct when NOT grouped, rotating style is good.
+                    // When grouped, we want them to look identical (same legend).
+
                     const styleIndex = Object.keys(colorMap).indexOf(groupKey);
                     const style = pointStyles[styleIndex % pointStyles.length];
 
                     const base = {
-                        label: displayName, borderColor: color, backgroundColor: color,
-                        pointRadius: 3, pointStyle: style, showLine: true, tension: 0.1, borderWidth: 1.5,
+                        label: displayName,
+                        borderColor: color,
+                        backgroundColor: color,
+                        pointRadius: 3,
+                        pointStyle: style,
+                        showLine: true,
+                        tension: 0.1,
+                        borderWidth: 1.5,
                         groupKey: groupKey,
                         originalColor: color // Persist for style toggling
                     };
