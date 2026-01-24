@@ -656,6 +656,104 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <details class="mb-8 bg-white p-4 rounded-md border shadow-sm">
+                                        <summary class="font-medium text-slate-700 cursor-pointer select-none">グラフの詳細設定 (軸・フォント・グループ化)</summary>
+                                        <div class="mt-4 space-y-6">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <!-- Axis Ranges -->
+                                                <div class="space-y-3">
+                                                    <h5 class="text-sm font-semibold text-slate-700 border-b pb-1">X軸の範囲</h5>
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="flex-1">
+                                                            <label class="block text-xs text-slate-500 mb-1">最小値 (Min)</label>
+                                                            <input type="number" id="chart-xmin" placeholder="自動"
+                                                                class="block w-full rounded-md shadow-sm p-2 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500">
+                                                        </div>
+                                                        <div class="flex-1">
+                                                            <label class="block text-xs text-slate-500 mb-1">最大値 (Max)</label>
+                                                            <input type="number" id="chart-xmax" placeholder="自動"
+                                                                class="block w-full rounded-md shadow-sm p-2 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="space-y-3">
+                                                    <h5 class="text-sm font-semibold text-slate-700 border-b pb-1">Y軸の範囲</h5>
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="flex-1">
+                                                            <label class="block text-xs text-slate-500 mb-1">最小値 (Min)</label>
+                                                            <input type="number" id="chart-ymin" placeholder="自動"
+                                                                class="block w-full rounded-md shadow-sm p-2 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500">
+                                                        </div>
+                                                        <div class="flex-1">
+                                                            <label class="block text-xs text-slate-500 mb-1">最大値 (Max)</label>
+                                                            <input type="number" id="chart-ymax" placeholder="自動"
+                                                                class="block w-full rounded-md shadow-sm p-2 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Font & Style -->
+                                                <div class="space-y-3">
+                                                    <h5 class="text-sm font-semibold text-slate-700 border-b pb-1">フォント・スタイル</h5>
+                                                    <div class="grid grid-cols-2 gap-3">
+                                                        <div>
+                                                            <label class="block text-xs text-slate-500 mb-1">フォント種別</label>
+                                                            <select id="chart-font-family"
+                                                                class="block w-full rounded-md shadow-sm p-2 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500">
+                                                                <option value="'Inter', 'Noto Sans JP', sans-serif">ゴシック体 (Sans)</option>
+                                                                <option value="'Times New Roman', 'YuMincho', serif">明朝体 (Serif)</option>
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-xs text-slate-500 mb-1">文字サイズ</label>
+                                                            <input type="number" id="chart-font-size" value="12" step="1"
+                                                                class="block w-full rounded-md shadow-sm p-2 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500">
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-xs text-slate-500 mb-1">点のサイズ</label>
+                                                            <input type="number" id="chart-point-size" value="3" step="0.5"
+                                                                class="block w-full rounded-md shadow-sm p-2 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500">
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-xs text-slate-500 mb-1">線の太さ</label>
+                                                            <input type="number" id="chart-line-width" value="1.5" step="0.5"
+                                                                class="block w-full rounded-md shadow-sm p-2 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Analysis Options -->
+                                                <div class="space-y-3">
+                                                    <h5 class="text-sm font-semibold text-slate-700 border-b pb-1">解析オプション</h5>
+                                                    <div class="space-y-2 pt-1">
+                                                        <label class="flex items-center cursor-pointer">
+                                                            <input type="checkbox" id="chart-group-by-name" class="h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+                                                            <span class="ml-2 text-sm text-slate-700">凡例名が同じデータをグループ化</span>
+                                                        </label>
+
+                                                        <label class="flex items-center cursor-pointer">
+                                                            <input type="checkbox" id="chart-show-average" class="h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+                                                            <span class="ml-2 text-sm text-slate-700">平均曲線をプロット</span>
+                                                        </label>
+
+                                                        <div id="average-settings-container" class="hidden pl-6">
+                                                            <label class="block text-xs text-slate-500 mb-1">ビンの分割幅 (m)</label>
+                                                            <input type="number" id="chart-average-bin-size" value="0.05" step="0.01"
+                                                                class="block w-32 rounded-md shadow-sm p-1.5 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <button id="apply-advanced-settings-btn"
+                                                    class="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm text-sm">
+                                                    設定を適用して再描画
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </details>
+
                                     <h3 class="text-lg font-semibold mb-4 text-slate-700">グラフのラベル編集</h3>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                         <div class="space-y-2 p-3 border rounded-md bg-slate-50/50">
@@ -2258,13 +2356,17 @@
                 if (typeRowIndex === -1 || nameRowIndex === -1 || propertyRowIndex === -1 || dataStartIndex === -1) throw new Error("CSVのヘッダー形式が不正です。");
 
                 const [typeRow, nameRow, propertyRow] = [data[typeRowIndex], data[nameRowIndex], data[propertyRowIndex]];
-                const rigidBodies = {};
+                const rigidBodies = [];
+                const nameCounts = {};
 
                 for (let i = 2; i < typeRow.length; i++) {
                     if (typeRow[i] === 'Rigid Body' && propertyRow[i] === 'Position') {
-                        const name = nameRow[i];
-                        if (!rigidBodies[name]) rigidBodies[name] = { name: name, posIndices: {} };
-                        rigidBodies[name].posIndices = { X: i, Y: i + 1, Z: i + 2 };
+                        let name = nameRow[i];
+                        if (!nameCounts[name]) nameCounts[name] = 0;
+                        nameCounts[name]++;
+                        if (nameCounts[name] > 1) name = `${name} (${nameCounts[name]})`;
+
+                        rigidBodies.push({ name: name, posIndices: { X: i, Y: i + 1, Z: i + 2 } });
                         i += 2;
                     }
                 }
@@ -2272,7 +2374,7 @@
                 const dataUnit = document.querySelector('input[name="data-unit"]:checked').value;
                 const conversionFactor = dataUnit === 'mm' ? 1000 : 1;
                 const actualData = data.slice(dataStartIndex).filter(row => row.length > 1 && row[1] !== '');
-                Object.values(rigidBodies).forEach(body => {
+                rigidBodies.forEach(body => {
                     body.data = actualData.map(row => ({
                         time: parseFloat(row[1]),
                         pos: {
@@ -2282,7 +2384,7 @@
                         }
                     })).filter(d => !isNaN(d.time) && !isNaN(d.pos.X));
                 });
-                return Object.values(rigidBodies);
+                return rigidBodies;
             }
 
             function displayRigidBodySelector(filename, rigidBodies) {
@@ -2556,6 +2658,11 @@
                 const filterStrength = lowpassStrengthInput ? parseFloat(lowpassStrengthInput.value) : 0;
                 const isFiltered = filterType !== 'none';
 
+                // Advanced Settings
+                const groupByName = document.getElementById('chart-group-by-name').checked;
+                const showAverage = document.getElementById('chart-show-average').checked;
+                const avgBinSize = parseFloat(document.getElementById('chart-average-bin-size').value) || 0.05;
+
                 const horizontalAxes = ['X', 'Y', 'Z'].filter(ax => ax !== verticalAxis);
                 const trajectoryYAxisName = horizontalAxes.find(ax => ax !== travelAxis);
 
@@ -2569,23 +2676,69 @@
                 const labelMapping = { 'v': 'velocity', 's': 'slip', 'z': 'vertical', 't': 'trajectory' };
                 const prefixMapping = { 'velocity': 'v', 'slip': 's', 'vertical': 'z', 'trajectory': 't' };
 
+                const defaultTitlesList = ["速度 vs 距離", "スリップ率 vs 距離", "鉛直変位 vs 距離", "平面移動軌跡"];
+
                 for (const [prefix, fullKey] of Object.entries(labelMapping)) {
                     const labels = initialLabels[fullKey];
-                    const finalTitle = isFiltered ? `${labels.title} (ローパス適用)` : labels.title;
-                    document.getElementById(`${prefix}-chart-title`).value = finalTitle;
-                    document.getElementById(`${prefix}-chart-xlabel`).value = labels.x;
-                    document.getElementById(`${prefix}-chart-ylabel`).value = labels.y;
+                    const titleInput = document.getElementById(`${prefix}-chart-title`);
+                    const currentTitle = titleInput.value;
+
+                    // Only overwrite if empty or if it's one of the default titles (ignoring suffix)
+                    // This preserves user customizations when re-rendering for style changes
+                    const baseTitle = currentTitle.replace(' (ローパス適用)', '');
+                    if (!currentTitle || defaultTitlesList.includes(baseTitle)) {
+                        const finalTitle = isFiltered ? `${labels.title} (ローパス適用)` : labels.title;
+                        titleInput.value = finalTitle;
+                    }
+
+                    // Always reset axis labels to default on re-render?
+                    // Probably safer to preserve them too if we want to be nice, but original requirement only mentioned title bug.
+                    // Let's preserve them if they match defaults or are empty.
+                    const xInput = document.getElementById(`${prefix}-chart-xlabel`);
+                    if (!xInput.value || xInput.value === labels.x) xInput.value = labels.x;
+
+                    const yInput = document.getElementById(`${prefix}-chart-ylabel`);
+                    if (!yInput.value || yInput.value === labels.y) yInput.value = labels.y;
                 }
 
-                const colors = ['#10b981', '#ef4444', '#3b82f6', '#f59e0b', '#8b5cf6', '#f97316'];
+                const colors = ['#10b981', '#ef4444', '#3b82f6', '#f59e0b', '#8b5cf6', '#f97316', '#06b6d4', '#e11d48'];
                 const pointStyles = ['circle', 'rect', 'cross', 'star', 'triangle', 'rectRot'];
+                const colorMap = {};
+                let colorIndex = 0;
 
-                const datasets = processedData.map((result, index) => {
-                    const color = colors[index % colors.length];
-                    const style = pointStyles[index % pointStyles.length];
+                const chartDataContainers = {
+                    velocity: [],
+                    slip: [],
+                    vertical: [],
+                    trajectory: []
+                };
+
+                processedData.forEach((result, index) => {
+                    let displayName = result.name;
+                    let groupKey = result.name;
+
+                    if (groupByName) {
+                        groupKey = result.name.replace(/ \(\d+\)$/, '');
+                        displayName = groupKey;
+                    }
+
+                    if (!colorMap[groupKey]) {
+                        colorMap[groupKey] = colors[colorIndex % colors.length];
+                        colorIndex++;
+                    }
+                    const color = colorMap[groupKey];
+                    // If grouping, use same style. If not, vary style?
+                    // User said "same group -> same color and plot shape".
+                    // If we assume different groups have different colors, we can reuse style or vary it.
+                    // Let's vary style by group index.
+                    const styleIndex = Object.keys(colorMap).indexOf(groupKey);
+                    const style = pointStyles[styleIndex % pointStyles.length];
+
                     const base = {
-                        label: result.name, borderColor: color, backgroundColor: color,
-                        pointRadius: 3, pointStyle: style, showLine: true, tension: 0.1, borderWidth: 1.5
+                        label: displayName, borderColor: color, backgroundColor: color,
+                        pointRadius: 3, pointStyle: style, showLine: true, tension: 0.1, borderWidth: 1.5,
+                        groupKey: groupKey,
+                        originalColor: color // Persist for style toggling
                     };
 
                     let velocityData = result.data.map(d => ({ x: d.distance, y: d.instVelocity }));
@@ -2603,82 +2756,158 @@
                         verticalData = applyGaussianFilter(verticalData, filterStrength);
                     }
 
-                    return {
-                        velocity: { ...base, data: velocityData },
-                        slip: { ...base, data: slipData },
-                        vertical: { ...base, data: verticalData },
-                        trajectory: { ...base, data: trajectoryData }
-                    };
+                    chartDataContainers.velocity.push({ ...base, data: velocityData });
+                    chartDataContainers.slip.push({ ...base, data: slipData });
+                    chartDataContainers.vertical.push({ ...base, data: verticalData });
+                    chartDataContainers.trajectory.push({ ...base, data: trajectoryData });
                 });
 
-                ['velocity', 'vertical'].forEach(key => {
+                // Averaging
+                if (showAverage) {
+                    ['velocity', 'slip', 'vertical', 'trajectory'].forEach(key => {
+                        const datasets = chartDataContainers[key];
+                        const groups = {};
+                        if (groupByName) {
+                            datasets.forEach(d => {
+                                if (!groups[d.groupKey]) groups[d.groupKey] = [];
+                                groups[d.groupKey].push(d);
+                            });
+                        } else {
+                            groups['All'] = datasets;
+                        }
+
+                        Object.keys(groups).forEach(gKey => {
+                            const avgData = calculateBinnedAverage(groups[gKey], avgBinSize);
+                            datasets.push({
+                                label: groupByName ? `${gKey} (Average)` : 'Average',
+                                data: avgData,
+                                borderColor: groupByName ? (colorMap[gKey] || '#000') : '#000',
+                                backgroundColor: 'rgba(0,0,0,0)',
+                                borderWidth: 4,
+                                pointRadius: 0,
+                                borderDash: [5, 5],
+                                tension: 0.4,
+                                originalColor: groupByName ? (colorMap[gKey] || '#000') : '#000'
+                            });
+                        });
+                    });
+                }
+
+                // Helper for Chart Creation
+                const createChart = (key, datasets, optionsOverride = {}) => {
                     const chartId = `${key}-chart`;
-                    const chartData = datasets.map(d => d[key]);
                     const prefix = prefixMapping[key];
                     const title = document.getElementById(`${prefix}-chart-title`).value;
                     const xlabel = document.getElementById(`${prefix}-chart-xlabel`).value;
                     const ylabel = document.getElementById(`${prefix}-chart-ylabel`).value;
+
+                    const options = getChartOptions(ylabel, xlabel, title);
+
+                    // Manual Range Overrides
+                    const xMin = document.getElementById('chart-xmin').value;
+                    const xMax = document.getElementById('chart-xmax').value;
+                    const yMin = document.getElementById('chart-ymin').value;
+                    const yMax = document.getElementById('chart-ymax').value;
+
+                    if (xMin) options.scales.x.min = parseFloat(xMin);
+                    if (xMax) options.scales.x.max = parseFloat(xMax);
+                    if (yMin) options.scales.y.min = parseFloat(yMin);
+                    if (yMax) options.scales.y.max = parseFloat(yMax);
+
+                    // Legend Grouping Filter
+                    if (groupByName) {
+                        options.plugins.legend.labels.filter = (item, data) => {
+                            // Only show if it's the first dataset with this label
+                            const firstIndex = data.datasets.findIndex(d => d.label === item.text);
+                            return item.datasetIndex === firstIndex;
+                        };
+                    }
+
+                    // Apply overrides
+                    Object.assign(options, optionsOverride);
+
+                    // If Slip chart, default Y min/max to 0-100 UNLESS overridden
+                    if (key === 'slip' && !yMin && !yMax) {
+                        options.scales.y.min = 0;
+                        options.scales.y.max = 100;
+                    }
+
                     chartInstances[chartId] = new Chart(document.getElementById(chartId), {
                         type: 'scatter',
-                        data: { datasets: chartData },
-                        options: getChartOptions(ylabel, xlabel, title)
+                        data: { datasets: datasets },
+                        options: options
                     });
-                });
+                };
 
-                const slipChartId = 'slip-chart';
-                const slipChartData = datasets.map(d => d.slip);
-                const slipPrefix = prefixMapping['slip'];
-                const slipTitle = document.getElementById(`${slipPrefix}-chart-title`).value;
-                const slipXLabel = document.getElementById(`${slipPrefix}-chart-xlabel`).value;
-                const slipYLabel = document.getElementById(`${slipPrefix}-chart-ylabel`).value;
-                const slipChartOptions = getChartOptions(slipYLabel, slipXLabel, slipTitle);
-                slipChartOptions.scales.y.min = 0;
-                slipChartOptions.scales.y.max = 100;
-                chartInstances[slipChartId] = new Chart(document.getElementById(slipChartId), {
-                    type: 'scatter',
-                    data: { datasets: slipChartData },
-                    options: slipChartOptions
-                });
+                createChart('velocity', chartDataContainers.velocity);
+                createChart('vertical', chartDataContainers.vertical);
+                createChart('slip', chartDataContainers.slip);
 
-                const trajectoryDatasets = datasets.map(d => d.trajectory);
+                // Trajectory with Aspect Ratio logic
+                const tDatasets = chartDataContainers.trajectory;
+                let tOptions = {};
+                // Calc bounds if not overridden
+                const xMin = document.getElementById('chart-xmin').value;
+                const xMax = document.getElementById('chart-xmax').value;
+                const yMin = document.getElementById('chart-ymin').value;
+                const yMax = document.getElementById('chart-ymax').value;
 
-                let minVal = Infinity, maxVal = -Infinity;
-                trajectoryDatasets.forEach(dataset => {
-                    dataset.data.forEach(point => {
-                        minVal = Math.min(minVal, point.x, point.y);
-                        maxVal = Math.max(maxVal, point.x, point.y);
+                if (!xMin && !xMax && !yMin && !yMax) {
+                    let minVal = Infinity, maxVal = -Infinity;
+                    tDatasets.forEach(dataset => {
+                        dataset.data.forEach(point => {
+                            minVal = Math.min(minVal, point.x, point.y);
+                            maxVal = Math.max(maxVal, point.x, point.y);
+                        });
                     });
-                });
-                const range = maxVal - minVal;
-                const padding = range === 0 ? 1 : range * 0.1;
-                const finalMin = minVal - padding;
-                const finalMax = maxVal + padding;
-
-                const trajectoryPrefix = prefixMapping['trajectory'];
-                const trajectoryTitle = document.getElementById(`${trajectoryPrefix}-chart-title`).value;
-                const trajectoryXLabel = document.getElementById(`${trajectoryPrefix}-chart-xlabel`).value;
-                const trajectoryYLabel = document.getElementById(`${trajectoryPrefix}-chart-ylabel`).value;
-                const trajectoryOptions = getChartOptions(trajectoryYLabel, trajectoryXLabel, trajectoryTitle);
-                trajectoryOptions.scales.x.min = finalMin;
-                trajectoryOptions.scales.x.max = finalMax;
-                trajectoryOptions.scales.y.min = finalMin;
-                trajectoryOptions.scales.y.max = finalMax;
-                trajectoryOptions.aspectRatio = 1;
-
-                chartInstances['trajectory-chart'] = new Chart(document.getElementById('trajectory-chart'), {
-                    type: 'scatter',
-                    data: { datasets: trajectoryDatasets },
-                    options: trajectoryOptions
-                });
+                    // Only process if data exists
+                    if (minVal !== Infinity) {
+                        const range = maxVal - minVal;
+                        const padding = range === 0 ? 1 : range * 0.1;
+                        const finalMin = minVal - padding;
+                        const finalMax = maxVal + padding;
+                        tOptions.scales = {
+                            x: { min: finalMin, max: finalMax },
+                            y: { min: finalMin, max: finalMax }
+                        };
+                    }
+                    tOptions.aspectRatio = 1;
+                }
+                createChart('trajectory', tDatasets, tOptions);
 
                 const currentStyle = document.querySelector('.style-btn.bg-blue-600');
                 handleStyleChange({ target: currentStyle || document.getElementById('style-casual') });
+            }
+
+            function calculateBinnedAverage(datasets, binSize) {
+                const allPoints = [];
+                datasets.forEach(d => d.data.forEach(p => allPoints.push(p)));
+                if (allPoints.length === 0) return [];
+
+                const xValues = allPoints.map(p => p.x);
+                const minX = Math.min(...xValues);
+
+                const bins = {};
+                allPoints.forEach(p => {
+                    const binIndex = Math.floor((p.x - minX) / binSize);
+                    if (!bins[binIndex]) bins[binIndex] = { sumY: 0, count: 0, sumX: 0 };
+                    bins[binIndex].sumY += p.y;
+                    bins[binIndex].sumX += p.x;
+                    bins[binIndex].count++;
+                });
+
+                const sortedIndices = Object.keys(bins).map(Number).sort((a, b) => a - b);
+                return sortedIndices.map(idx => ({
+                    x: bins[idx].sumX / bins[idx].count,
+                    y: bins[idx].sumY / bins[idx].count
+                }));
             }
 
             function updateAllChartLabels() {
                 const filterType = lowpassFilterTypeSelect.value;
                 const isFiltered = filterType !== 'none';
                 const suffix = isFiltered ? ' (ローパス適用)' : '';
+                const defaultTitles = ["速度 vs 距離", "スリップ率 vs 距離", "鉛直変位 vs 距離", "平面移動軌跡"];
 
                 document.querySelectorAll('.chart-label-input').forEach(input => {
                     const chartId = input.dataset.chartId;
@@ -2688,7 +2917,12 @@
 
                     if (labelType === 'title') {
                         let baseTitle = input.value.replace(' (ローパス適用)', '');
-                        chart.options.plugins.title.text = baseTitle + suffix;
+                        // Only append suffix if the base title is one of the defaults
+                        if (defaultTitles.includes(baseTitle)) {
+                            chart.options.plugins.title.text = baseTitle + suffix;
+                        } else {
+                            chart.options.plugins.title.text = baseTitle;
+                        }
                     }
                     if (labelType === 'x') chart.options.scales.x.title.text = input.value;
                     if (labelType === 'y') chart.options.scales.y.title.text = input.value;
@@ -2730,8 +2964,26 @@
                 const casualStyles = { color: '#334155', font: { weight: 'normal' } };
                 const newStyles = isFormal ? formalStyles : casualStyles;
 
+                // Advanced Settings Overrides
+                const fontFamily = document.getElementById('chart-font-family').value;
+                const fontSize = parseInt(document.getElementById('chart-font-size').value, 10);
+                const pointSize = parseFloat(document.getElementById('chart-point-size').value);
+                const lineWidth = parseFloat(document.getElementById('chart-line-width').value);
+
                 Object.values(chartInstances).forEach(chart => {
                     if (!chart || !chart.options || !chart.options.plugins || !chart.options.scales) return;
+
+                    const updateFont = (fontObj) => {
+                        fontObj.family = fontFamily;
+                        fontObj.size = fontSize;
+                    };
+
+                    updateFont(chart.options.scales.x.title.font);
+                    updateFont(chart.options.scales.x.ticks.font);
+                    updateFont(chart.options.scales.y.title.font);
+                    updateFont(chart.options.scales.y.ticks.font);
+                    updateFont(chart.options.plugins.title.font);
+                    updateFont(chart.options.plugins.legend.labels.font);
 
                     chart.options.plugins.title.color = newStyles.color;
                     chart.options.plugins.title.font.weight = newStyles.font.weight;
@@ -2749,7 +3001,12 @@
                         chart.options.scales.x.border = { color: '#000', width: 2 };
                         chart.options.scales.y.border = { color: '#000', width: 2 };
                         chart.data.datasets.forEach(dataset => {
-                            Object.assign(dataset, { borderColor: '#000', backgroundColor: 'rgba(0,0,0,0.1)', borderWidth: 1, pointRadius: 2.5 });
+                            if (dataset.label && dataset.label.includes('Average')) {
+                                dataset.borderColor = '#000';
+                                dataset.borderWidth = 4;
+                            } else {
+                                Object.assign(dataset, { borderColor: '#000', backgroundColor: 'rgba(0,0,0,0.1)', borderWidth: lineWidth, pointRadius: pointSize });
+                            }
                         });
                     } else {
                         chart.options.scales.x.grid.display = true;
@@ -2759,10 +3016,13 @@
                         chart.options.scales.x.border = { color: '#cbd5e1' };
                         chart.options.scales.y.border = { color: '#cbd5e1' };
 
-                        const colors = ['#10b981', '#ef4444', '#3b82f6', '#f59e0b', '#8b5cf6', '#f97316'];
-                        chart.data.datasets.forEach((dataset, i) => {
-                            const color = colors[i % colors.length];
-                            Object.assign(dataset, { borderColor: color, backgroundColor: color, borderWidth: 1.5, pointRadius: 3 });
+                        chart.data.datasets.forEach(dataset => {
+                            if (dataset.originalColor) {
+                                dataset.borderColor = dataset.originalColor;
+                                dataset.backgroundColor = dataset.originalColor;
+                            }
+                            dataset.borderWidth = (dataset.label && dataset.label.includes('Average')) ? 4 : lineWidth;
+                            dataset.pointRadius = (dataset.label && dataset.label.includes('Average')) ? 0 : pointSize;
                         });
                     }
                     chart.update('none');
@@ -2860,6 +3120,20 @@
             const errorDisplayStd = document.getElementById('error-display-std');
 
             let parsedCsvDataStd = null;
+
+            // Advanced Settings Handlers
+            const showAverageCheckbox = document.getElementById('chart-show-average');
+            if (showAverageCheckbox) {
+                showAverageCheckbox.addEventListener('change', (e) => {
+                    document.getElementById('average-settings-container').classList.toggle('hidden', !e.target.checked);
+                });
+            }
+            const applyAdvancedSettingsBtn = document.getElementById('apply-advanced-settings-btn');
+            if (applyAdvancedSettingsBtn) {
+                applyAdvancedSettingsBtn.addEventListener('click', () => {
+                    rerenderCharts();
+                });
+            }
 
             if (fileInputStd) {
                 fileInputStd.addEventListener('change', handleFileSelectStd);
