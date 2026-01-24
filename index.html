@@ -2824,6 +2824,19 @@
                     }
 
                     // Apply overrides
+                    if (optionsOverride.scales) {
+                        // Deep merge scales to preserve title/ticks fonts
+                        if (optionsOverride.scales.x) {
+                            if (!options.scales.x) options.scales.x = {};
+                            Object.assign(options.scales.x, optionsOverride.scales.x);
+                        }
+                        if (optionsOverride.scales.y) {
+                            if (!options.scales.y) options.scales.y = {};
+                            Object.assign(options.scales.y, optionsOverride.scales.y);
+                        }
+                        // Remove scales from override to avoid Object.assign wiping them out
+                        delete optionsOverride.scales;
+                    }
                     Object.assign(options, optionsOverride);
 
                     // If Slip chart, default Y min/max to 0-100 UNLESS overridden
@@ -2974,16 +2987,24 @@
                     if (!chart || !chart.options || !chart.options.plugins || !chart.options.scales) return;
 
                     const updateFont = (fontObj) => {
-                        fontObj.family = fontFamily;
-                        fontObj.size = fontSize;
+                        if (fontObj) {
+                            fontObj.family = fontFamily;
+                            fontObj.size = fontSize;
+                        }
                     };
 
-                    updateFont(chart.options.scales.x.title.font);
-                    updateFont(chart.options.scales.x.ticks.font);
-                    updateFont(chart.options.scales.y.title.font);
-                    updateFont(chart.options.scales.y.ticks.font);
-                    updateFont(chart.options.plugins.title.font);
-                    updateFont(chart.options.plugins.legend.labels.font);
+                    if (chart.options.scales && chart.options.scales.x) {
+                        if (chart.options.scales.x.title) updateFont(chart.options.scales.x.title.font);
+                        if (chart.options.scales.x.ticks) updateFont(chart.options.scales.x.ticks.font);
+                    }
+                    if (chart.options.scales && chart.options.scales.y) {
+                        if (chart.options.scales.y.title) updateFont(chart.options.scales.y.title.font);
+                        if (chart.options.scales.y.ticks) updateFont(chart.options.scales.y.ticks.font);
+                    }
+                    if (chart.options.plugins) {
+                        if (chart.options.plugins.title) updateFont(chart.options.plugins.title.font);
+                        if (chart.options.plugins.legend && chart.options.plugins.legend.labels) updateFont(chart.options.plugins.legend.labels.font);
+                    }
 
                     chart.options.plugins.title.color = newStyles.color;
                     chart.options.plugins.title.font.weight = newStyles.font.weight;
