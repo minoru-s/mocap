@@ -301,6 +301,32 @@
             <main class="p-4 sm:p-6 md:p-8">
                 <div id="home" class="page">
                     <div class="max-w-5xl mx-auto">
+                        <!-- PWA Install Banner (Initially Hidden) -->
+                        <div id="pwa-install-banner" class="hidden mb-8 relative bg-white/70 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.06)] rounded-2xl p-5 sm:p-6 transition-all duration-300">
+                            <button id="pwa-dismiss-btn" class="absolute top-3 right-3 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors" title="閉じる">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 sm:pr-8">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-md flex items-center justify-center text-white border border-slate-700/50">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-slate-900 text-base">アプリとしてインストール</h3>
+                                        <p class="text-sm text-slate-500 mt-0.5">Mocap Plusをデスクトップアプリとして追加し、素早くアクセスできます。</p>
+                                    </div>
+                                </div>
+                                <button id="pwa-install-btn" class="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-medium py-2 px-6 rounded-full shadow-md transition-transform hover:scale-105 active:scale-95 whitespace-nowrap text-sm">
+                                    インストール
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="bg-white p-8 rounded-xl shadow-sm border">
                             <h1 class="text-3xl font-bold text-slate-800 mb-2">Mocap Plus へようこそ</h1>
                             <p class="text-slate-600 mb-8">
@@ -5179,6 +5205,63 @@
                         });
                 });
             }
+
+            // PWA Installation Logic
+            let deferredPrompt;
+            const pwaInstallBanner = document.getElementById('pwa-install-banner');
+            const pwaInstallBtn = document.getElementById('pwa-install-btn');
+            const pwaDismissBtn = document.getElementById('pwa-dismiss-btn');
+
+            // Check if user previously dismissed the banner
+            const hasDismissedPwaBanner = localStorage.getItem('mocap_plus_pwa_dismissed') === 'true';
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Prevent the mini-infobar from appearing on mobile
+                e.preventDefault();
+                // Stash the event so it can be triggered later.
+                deferredPrompt = e;
+                // Update UI notify the user they can install the PWA, only if not dismissed
+                if (pwaInstallBanner && !hasDismissedPwaBanner) {
+                    pwaInstallBanner.classList.remove('hidden');
+                }
+            });
+
+            if (pwaDismissBtn) {
+                pwaDismissBtn.addEventListener('click', () => {
+                    if (pwaInstallBanner) {
+                        pwaInstallBanner.classList.add('hidden');
+                    }
+                    // Save dismissal state
+                    localStorage.setItem('mocap_plus_pwa_dismissed', 'true');
+                });
+            }
+
+            if (pwaInstallBtn) {
+                pwaInstallBtn.addEventListener('click', async () => {
+                    if (!deferredPrompt) return;
+                    // Show the install prompt
+                    deferredPrompt.prompt();
+                    // Wait for the user to respond to the prompt
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`User response to the install prompt: ${outcome}`);
+                    // We've used the prompt, and can't use it again, throw it away
+                    deferredPrompt = null;
+                    // Hide the banner
+                    if (pwaInstallBanner) {
+                        pwaInstallBanner.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Optional: Hide banner if app is already installed
+            window.addEventListener('appinstalled', (evt) => {
+                console.log('INSTALL: Success');
+                if (pwaInstallBanner) {
+                    pwaInstallBanner.classList.add('hidden');
+                }
+                deferredPrompt = null;
+            });
+
         });
     </script>
 </body>
