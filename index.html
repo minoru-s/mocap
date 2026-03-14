@@ -465,7 +465,7 @@
                 </div>
 
                 <div class="page" id="data-trimming">
-                    <div class="max-w-7xl mx-auto space-y-8">
+                    <div class="max-w-6xl mx-auto space-y-8">
                         <section class="mac-card p-8">
                             <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">1. データ入力</h2>
                             <div class="flex flex-col items-center gap-3">
@@ -554,7 +554,7 @@
                 </div>
 
                 <div class="page" id="data-analysis">
-                    <div class="max-w-7xl mx-auto space-y-8">
+                    <div class="max-w-6xl mx-auto space-y-8">
                         <section class="mac-card p-8">
                             <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">1. データ入力</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
@@ -902,7 +902,7 @@
                 </div>
 
                 <div class="page" id="wide-area-analysis">
-                    <div class="max-w-7xl mx-auto space-y-8">
+                    <div class="max-w-6xl mx-auto space-y-8">
                         <section id="settings-card-wide" class="mac-card p-8">
                             <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">1. 設定</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -1148,8 +1148,8 @@
 
 
                 <div class="page" id="standard-velocity">
-                    <div class="max-w-3xl mx-auto space-y-8">
-                        <section id="step-1-file-upload-std" class="mac-card p-8">
+                    <div class="max-w-6xl mx-auto space-y-8">
+                        <section id="step-1-file-upload-std" class="mac-card p-8 max-w-3xl mx-auto">
                             <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">1. データ入力</h2>
                             <div class="mt-4 flex flex-col items-center gap-3">
                                 <label for="csv-file-input-std"
@@ -1166,7 +1166,7 @@
                             <p class="text-gray-500 mt-4 font-medium">ファイルを解析中...</p>
                         </div>
 
-                        <section id="step-2-parameters-std" class="hidden mac-card p-8">
+                        <section id="step-2-parameters-std" class="hidden mac-card p-8 max-w-3xl mx-auto">
                             <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">2. パラメータ設定</h2>
                             <div class="mt-4 space-y-6 max-w-sm mx-auto">
                                 <div>
@@ -1215,7 +1215,7 @@
                             </div>
                         </section>
 
-                        <section id="step-3-results-std" class="hidden mac-card p-8">
+                        <section id="step-3-results-std" class="hidden mac-card p-8 bg-blue-50/30 border border-blue-100/50 max-w-3xl mx-auto">
                             <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">3. 計算結果</h2>
                             <div id="result-display-std"
                                 class="hidden mt-6 p-8 bg-gray-50/50 rounded-2xl text-center border border-gray-100">
@@ -1237,7 +1237,7 @@
                 </div>
 
                 <div class="page" id="distance-measurement">
-                    <div class="max-w-7xl mx-auto space-y-8">
+                    <div class="max-w-6xl mx-auto space-y-8">
                         <section class="mac-card p-8">
                             <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">1. 設定</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -1348,10 +1348,9 @@
                 </div>
 
                 <div class="page" id="how-to-use">
-                    <h1 class="text-2xl font-semibold text-gray-900 mb-8 text-center tracking-tight">使い方ガイド</h1>
-
-                    <div class="space-y-10">
-                        <div class="mac-card">
+                    <div class="max-w-6xl mx-auto space-y-8">
+                        <div class="space-y-10">
+                            <div class="mac-card">
                             <div class="p-6 sm:p-8">
                                 <h2 class="text-xl font-semibold text-gray-900 flex items-center gap-3 mb-6">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -1405,6 +1404,7 @@
                                                 <li>各グラフはPNGまたはPDF形式でダウンロードできます。</li>
                                             </ul>
                                         </div>
+                                    </div>
                                     </div>
                                 </div>
                             </div>
@@ -1614,9 +1614,9 @@
                 </div>
 
                 <div class="page" id="algorithms">
-                    <div class="max-w-4xl mx-auto space-y-8">
+                    <div class="max-w-6xl mx-auto space-y-8">
                         <div class="mac-card p-8">
-                            <h1 class="text-2xl font-bold text-gray-900 tracking-tight mb-6 border-b border-gray-100 pb-4">アルゴリズム仕様</h1>
+                            <h2 class="text-xl font-semibold text-gray-900 tracking-tight mb-6 border-b border-gray-100 pb-4">アルゴリズム仕様</h2>
                             <div class="prose-styles">
                                 <p>本ツールで採用されているデータ解析のアルゴリズムおよび計算式について、その詳細を以下に示します。</p>
 
@@ -1820,9 +1820,9 @@
                 </div>
 
                 <div class="page" id="about">
-                    <div class="max-w-4xl mx-auto space-y-8">
-                        <div class="bg-white p-8 rounded-lg shadow-sm border">
-                            <h1 class="text-2xl font-bold text-slate-800 mb-6 border-b pb-3">このツールについて</h1>
+                    <div class="max-w-6xl mx-auto space-y-8">
+                        <div class="mac-card p-8">
+                            <h2 class="text-xl font-semibold text-gray-900 tracking-tight mb-6 border-b border-gray-100 pb-4">このツールについて</h2>
                             <div class="prose prose-slate max-w-none">
                                 <div>
                                     <h2 class="text-xl font-semibold text-slate-700">基本情報</h2>
