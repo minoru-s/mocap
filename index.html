@@ -31,8 +31,10 @@
     <style>
         body {
             font-family: 'Inter', 'Noto Sans JP', sans-serif;
-            background-color: #f1f5f9;
-            /* slate-100 */
+            background-color: #f5f5f7;
+            /* Modern light mode background */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .chart-container {
@@ -81,10 +83,13 @@
         }
 
         .nav-link.active {
-            background-color: #e2e8f0;
-            /* slate-200 */
-            color: #1e293b;
-            /* slate-800 */
+            background-color: rgba(0, 0, 0, 0.05);
+            color: #000;
+            font-weight: 500;
+        }
+
+        .nav-link {
+            transition: all 0.2s ease;
         }
 
         /* Mobile Menu Overlay */
@@ -107,7 +112,8 @@
 
         /* macOS like scrollbar */
         ::-webkit-scrollbar {
-            width: 12px;
+            width: 14px;
+            height: 14px;
         }
 
         ::-webkit-scrollbar-track {
@@ -115,11 +121,57 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            /* slate-300 */
+            background-color: rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            border: 4px solid transparent;
+            background-clip: padding-box;
+            transition: background-color 0.2s;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(0, 0, 0, 0.25);
+        }
+
+        /* macOS style focus rings */
+        *:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 125, 250, 0.4);
+            border-radius: inherit;
+        }
+
+        /* Deep, soft shadows for modern depth */
+        .mac-shadow {
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08), 0 4px 12px -4px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Modern premium glass card */
+        .mac-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            /* Edge highlight to give a sense of volume */
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
             border-radius: 20px;
-            border: 3px solid #f1f5f9;
-            /* slate-100 */
+        }
+
+        /* Modern subtle inner shadow for inputs to add depth */
+        .modern-input {
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Gradient buttons for a premium feel */
+        .btn-gradient-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39);
+        }
+        .btn-gradient-primary:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.23);
+            transform: translateY(-1px);
         }
 
         .prose-styles h3 {
@@ -176,15 +228,15 @@
         </div>
     </div>
 
-    <div class="flex min-h-screen bg-slate-100">
+    <div class="flex min-h-screen" style="background-color: #f5f5f7;">
         <aside
-            class="hidden lg:flex flex-col w-60 bg-slate-200/50 backdrop-blur-xl border-r border-slate-300/50 h-screen sticky top-0">
-            <div class="flex items-center justify-center h-16 border-b border-slate-300/50 px-4">
-                <img src="icons/icon-192.png" style="width: 25px; height: auto;">
-                <h1 class="text-lg font-bold text-slate-800 ml-2">Mocap Plus</h1>
+            class="hidden lg:flex flex-col w-64 bg-[#ececec]/80 backdrop-blur-2xl border-r border-gray-200/60 h-screen sticky top-0 z-40" style="-webkit-backdrop-filter: blur(20px);">
+            <div class="flex items-center px-6 h-16 pt-4">
+                <img src="icons/icon-192.png" style="width: 28px; height: auto; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h1 class="text-lg font-semibold text-gray-800 ml-3 tracking-tight">Mocap Plus</h1>
             </div>
-            <nav class="flex-1 px-3 py-4 space-y-1">
-                <a class="nav-link flex items-center px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-md transition-colors duration-150"
+            <nav class="flex-1 px-3 py-4 space-y-1.5 mt-2">
+                <a class="nav-link flex items-center px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-200/50 rounded-lg transition-colors duration-150"
                     href="#home">
                     <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
@@ -193,7 +245,7 @@
                     </svg>
                     <span>ホーム</span>
                 </a>
-                <a class="nav-link flex items-center px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-md transition-colors duration-150"
+                <a class="nav-link flex items-center px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-200/50 rounded-lg transition-colors duration-150"
                     href="#data-analysis">
                     <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
@@ -204,7 +256,7 @@
                     </svg>
                     <span>データ解析ツール</span>
                 </a>
-                <a class="nav-link flex items-center px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-md transition-colors duration-150"
+                <a class="nav-link flex items-center px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-200/50 rounded-lg transition-colors duration-150"
                     href="#wide-area-analysis">
                     <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
@@ -214,7 +266,7 @@
                     </svg>
                     <span>広域解析ツール</span>
                 </a>
-                <a class="nav-link flex items-center px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-md transition-colors duration-150"
+                <a class="nav-link flex items-center px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-200/50 rounded-lg transition-colors duration-150"
                     href="#standard-velocity">
                     <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
@@ -224,7 +276,7 @@
                     </svg>
                     <span>基準速度算出ツール</span>
                 </a>
-                <a class="nav-link flex items-center px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-md transition-colors duration-150"
+                <a class="nav-link flex items-center px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-200/50 rounded-lg transition-colors duration-150"
                     href="#distance-measurement">
                     <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
@@ -241,7 +293,7 @@
                     </svg>
                     <span>距離測定ツール</span>
                 </a>
-                <a class="nav-link flex items-center px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-md transition-colors duration-150"
+                <a class="nav-link flex items-center px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-200/50 rounded-lg transition-colors duration-150"
                     href="#data-trimming">
                     <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
@@ -250,8 +302,8 @@
                     </svg>
                     <span>データトリミング</span>
                 </a>
-                <div class="pt-4 mt-4 border-t border-slate-300/60">
-                    <a class="nav-link flex items-center px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-md transition-colors duration-150"
+                <div class="pt-4 mt-4 border-t border-gray-300/40">
+                    <a class="nav-link flex items-center px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-200/50 rounded-lg transition-colors duration-150"
                         href="#how-to-use">
                         <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor" stroke-width="2">
@@ -262,7 +314,7 @@
                         </svg>
                         <span>使い方ガイド</span>
                     </a>
-                    <a class="nav-link flex items-center px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-md transition-colors duration-150"
+                    <a class="nav-link flex items-center px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-200/50 rounded-lg transition-colors duration-150"
                         href="#algorithms">
                         <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor" stroke-width="2">
@@ -271,7 +323,7 @@
                         </svg>
                         <span>アルゴリズム仕様</span>
                     </a>
-                    <a class="nav-link flex items-center px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-md transition-colors duration-150"
+                    <a class="nav-link flex items-center px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-200/50 rounded-lg transition-colors duration-150"
                         href="#about">
                         <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor" stroke-width="2">
@@ -286,15 +338,15 @@
 
         <div id="main-content-area" class="flex flex-col flex-1">
             <header
-                class="lg:hidden flex items-center justify-between bg-white/70 backdrop-blur-lg p-4 border-b sticky top-0 z-10">
-                <button id="mobile-menu-btn" class="p-2 -ml-2">
-                    <svg class="h-6 w-6 text-slate-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                class="lg:hidden flex items-center justify-between bg-[#f5f5f7]/80 backdrop-blur-xl p-4 border-b border-gray-200/60 sticky top-0 z-10" style="-webkit-backdrop-filter: blur(20px);">
+                <button id="mobile-menu-btn" class="p-2 -ml-2 rounded-lg hover:bg-gray-200/50 transition-colors">
+                    <svg class="h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
-                <h1 id="mobile-title" class="text-lg font-semibold text-slate-800">ホーム</h1>
+                <h1 id="mobile-title" class="text-base font-semibold text-gray-800 tracking-tight">ホーム</h1>
                 <div class="w-6"></div>
             </header>
 
@@ -327,84 +379,84 @@
                             </div>
                         </div>
 
-                        <div class="bg-white p-8 rounded-xl shadow-sm border">
-                            <h1 class="text-3xl font-bold text-slate-800 mb-2">Mocap Plus へようこそ</h1>
-                            <p class="text-slate-600 mb-8">
+                        <div class="mac-card p-8">
+                            <h1 class="text-3xl font-bold text-gray-900 tracking-tight mb-2">Mocap Plus へようこそ</h1>
+                            <p class="text-gray-600 mb-8 font-medium">
                                 OptiTrackの解析ソフト「Motive」からエクスポートされたcsvファイルを添付するだけで、モーションキャプチャのデータを簡単に解析することができる統合ツールです。
                             </p>
                             <div class="grid md:grid-cols-3 gap-6">
                                 <a href="#data-analysis"
-                                    class="nav-card group block bg-slate-50 p-6 rounded-lg border transition-all duration-300 hover:shadow-lg hover:border-blue-300 hover:-translate-y-1">
-                                    <h2 class="text-xl font-semibold text-slate-800 mb-2">データ解析</h2>
-                                    <p class="text-slate-600">速度、スリップ率などを計算し、グラフで可視化します。</p>
+                                    class="nav-card group block bg-white/50 p-6 rounded-2xl border border-gray-100 transition-all duration-300 hover:mac-shadow hover:bg-white hover:-translate-y-1">
+                                    <h2 class="text-lg font-semibold text-gray-900 mb-2">データ解析</h2>
+                                    <p class="text-gray-500 text-sm">速度、スリップ率などを計算し、グラフで可視化します。</p>
                                 </a>
                                 <a href="#wide-area-analysis"
-                                    class="nav-card group block bg-slate-50 p-6 rounded-lg border transition-all duration-300 hover:shadow-lg hover:border-purple-300 hover:-translate-y-1">
-                                    <h2 class="text-xl font-semibold text-slate-800 mb-2">広域解析</h2>
-                                    <p class="text-slate-600">広範囲の移動軌跡とヒートマップを生成し、網羅率を計算します。</p>
+                                    class="nav-card group block bg-white/50 p-6 rounded-2xl border border-gray-100 transition-all duration-300 hover:mac-shadow hover:bg-white hover:-translate-y-1">
+                                    <h2 class="text-lg font-semibold text-gray-900 mb-2">広域解析</h2>
+                                    <p class="text-gray-500 text-sm">広範囲の移動軌跡とヒートマップを生成し、網羅率を計算します。</p>
                                 </a>
                                 <a href="#standard-velocity"
-                                    class="nav-card group block bg-slate-50 p-6 rounded-lg border transition-all duration-300 hover:shadow-lg hover:border-green-300 hover:-translate-y-1">
-                                    <h2 class="text-xl font-semibold text-slate-800 mb-2">基準速度の算出</h2>
-                                    <p class="text-slate-600">車輪の回転周期から基準となる速度を計算します。</p>
+                                    class="nav-card group block bg-white/50 p-6 rounded-2xl border border-gray-100 transition-all duration-300 hover:mac-shadow hover:bg-white hover:-translate-y-1">
+                                    <h2 class="text-lg font-semibold text-gray-900 mb-2">基準速度の算出</h2>
+                                    <p class="text-gray-500 text-sm">車輪の回転周期から基準となる速度を計算します。</p>
                                 </a>
                                 <a href="#distance-measurement"
-                                    class="nav-card group block bg-slate-50 p-6 rounded-lg border transition-all duration-300 hover:shadow-lg hover:border-pink-300 hover:-translate-y-1">
-                                    <h2 class="text-xl font-semibold text-slate-800 mb-2">距離測定</h2>
-                                    <p class="text-slate-600">マーカー間や剛体間の平均位置からの距離を測定します。</p>
+                                    class="nav-card group block bg-white/50 p-6 rounded-2xl border border-gray-100 transition-all duration-300 hover:mac-shadow hover:bg-white hover:-translate-y-1">
+                                    <h2 class="text-lg font-semibold text-gray-900 mb-2">距離測定</h2>
+                                    <p class="text-gray-500 text-sm">マーカー間や剛体間の平均位置からの距離を測定します。</p>
                                 </a>
                                 <a href="#data-trimming"
-                                    class="nav-card group block bg-slate-50 p-6 rounded-lg border transition-all duration-300 hover:shadow-lg hover:border-orange-300 hover:-translate-y-1">
-                                    <h2 class="text-xl font-semibold text-slate-800 mb-2">データトリミング</h2>
-                                    <p class="text-slate-600">データの範囲を選択し、必要な区間だけを抽出してCSVとして出力します。</p>
+                                    class="nav-card group block bg-white/50 p-6 rounded-2xl border border-gray-100 transition-all duration-300 hover:mac-shadow hover:bg-white hover:-translate-y-1">
+                                    <h2 class="text-lg font-semibold text-gray-900 mb-2">データトリミング</h2>
+                                    <p class="text-gray-500 text-sm">データの範囲を選択し、必要な区間だけを抽出してCSVとして出力します。</p>
                                 </a>
                             </div>
                         </div>
 
                         <div class="mt-10">
-                            <h2 class="text-2xl font-bold text-slate-800 mb-4">お知らせ</h2>
+                            <h2 class="text-2xl font-bold text-gray-900 tracking-tight mb-4">お知らせ</h2>
                             <div class="space-y-4">
                                 <!-- MODIFICATION: Added new development log -->
-                                <div class="bg-white p-5 rounded-xl shadow-sm border">
-                                    <p class="text-sm text-slate-500">2026/03/13</p>
-                                    <p class="font-semibold text-slate-800 mt-1">アプリのURLを変更</p>
-                                    <p class="text-sm text-slate-600 mt-2">
+                                <div class="mac-card p-5">
+                                    <p class="text-xs text-gray-400 font-medium">2026/03/13</p>
+                                    <p class="font-semibold text-gray-800 mt-1">アプリのURLを変更</p>
+                                    <p class="text-sm text-gray-600 mt-2">
                                         開発者のGit Hubのユーザ名変更に伴い、アプリのURLが変更になりました。アプリの再インストールやお気に入りの再登録をお願いいたします。</p>
                                 </div>
-                                <div class="bg-white p-5 rounded-xl shadow-sm border">
-                                    <p class="text-sm text-slate-500">2025/12/17</p>
-                                    <p class="font-semibold text-slate-800 mt-1">「データトリミングツール」を追加</p>
-                                    <p class="text-sm text-slate-600 mt-2">
+                                <div class="mac-card p-5">
+                                    <p class="text-xs text-gray-400 font-medium">2025/12/17</p>
+                                    <p class="font-semibold text-gray-800 mt-1">「データトリミングツール」を追加</p>
+                                    <p class="text-sm text-gray-600 mt-2">
                                         データの範囲を選択し、必要な区間だけを抽出してMotive互換のCSVファイルとして出力する機能を追加しました。</p>
                                 </div>
-                                <div class="bg-white p-5 rounded-xl shadow-sm border">
-                                    <p class="text-sm text-slate-500">2025/12/16</p>
-                                    <p class="font-semibold text-slate-800 mt-1">「距離測定ツール」を追加</p>
-                                    <p class="text-sm text-slate-600 mt-2">点Aと点Bの平均座標を計算し、ユークリッド距離を測定する機能を追加しました。</p>
+                                <div class="mac-card p-5">
+                                    <p class="text-xs text-gray-400 font-medium">2025/12/16</p>
+                                    <p class="font-semibold text-gray-800 mt-1">「距離測定ツール」を追加</p>
+                                    <p class="text-sm text-gray-600 mt-2">点Aと点Bの平均座標を計算し、ユークリッド距離を測定する機能を追加しました。</p>
                                 </div>
-                                <div class="bg-white p-5 rounded-xl shadow-sm border">
-                                    <p class="text-sm text-slate-500">2025/10/20</p>
-                                    <p class="font-semibold text-slate-800 mt-1">「広域解析ツール」を追加</p>
-                                    <p class="text-sm text-slate-600 mt-2">
+                                <div class="mac-card p-5">
+                                    <p class="text-xs text-gray-400 font-medium">2025/10/20</p>
+                                    <p class="font-semibold text-gray-800 mt-1">「広域解析ツール」を追加</p>
+                                    <p class="text-sm text-gray-600 mt-2">
                                         広範囲の移動軌跡や滞在頻度を可視化するヒートマップ機能、指定範囲に対する網羅率を計算する機能を追加しました。</p>
                                 </div>
-                                <div class="bg-white p-5 rounded-xl shadow-sm border">
-                                    <p class="text-sm text-slate-500">2025/08/07</p>
-                                    <p class="font-semibold text-slate-800 mt-1">機能とUIを改善</p>
-                                    <p class="text-sm text-slate-600 mt-2">
+                                <div class="mac-card p-5">
+                                    <p class="text-xs text-gray-400 font-medium">2025/08/07</p>
+                                    <p class="font-semibold text-gray-800 mt-1">機能とUIを改善</p>
+                                    <p class="text-sm text-gray-600 mt-2">
                                         データ解析ツールでファイルを後からでも追加できるよう修正。スクロールしたときにメニューが固定されるようUIを改善。</p>
                                 </div>
-                                <div class="bg-white p-5 rounded-xl shadow-sm border">
-                                    <p class="text-sm text-slate-500">2025/08/05</p>
-                                    <p class="font-semibold text-slate-800 mt-1">機能改善とアルゴリズム修正</p>
-                                    <p class="text-sm text-slate-600 mt-2">
+                                <div class="mac-card p-5">
+                                    <p class="text-xs text-gray-400 font-medium">2025/08/05</p>
+                                    <p class="font-semibold text-gray-800 mt-1">機能改善とアルゴリズム修正</p>
+                                    <p class="text-sm text-gray-600 mt-2">
                                         ローパスフィルタに「ガウシアンフィルタ」を追加し、ユーザが選択できるようにしました。また、往復運動があるデータでも正確に動作区間を検出できるよう、アルゴリズムを修正しました。
                                     </p>
                                 </div>
-                                <div class="bg-white p-5 rounded-xl shadow-sm border">
-                                    <p class="text-sm text-slate-500">2025/07/04</p>
-                                    <p class="font-semibold text-slate-800 mt-1">分散の表示とローパスフィルタの追加</p>
-                                    <p class="text-sm text-slate-600 mt-2">
+                                <div class="mac-card p-5">
+                                    <p class="text-xs text-gray-400 font-medium">2025/07/04</p>
+                                    <p class="font-semibold text-gray-800 mt-1">分散の表示とローパスフィルタの追加</p>
+                                    <p class="text-sm text-gray-600 mt-2">
                                         データ解析ツールに分散表示機能と、ユーザが任意に設定できるローパスフィルタ機能を追加しました。</p>
                                 </div>
                             </div>
@@ -415,75 +467,75 @@
                 <div class="page" id="data-trimming">
                     <div class="max-w-7xl mx-auto space-y-8">
                         <header class="text-center">
-                            <h1 class="text-3xl font-bold text-slate-800">データトリミングツール</h1>
-                            <p class="text-slate-500 mt-2">データの範囲を選択し、必要な区間だけを抽出してCSVとして出力します。</p>
+                            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">データトリミングツール</h1>
+                            <p class="text-gray-500 mt-2 font-medium">データの範囲を選択し、必要な区間だけを抽出してCSVとして出力します。</p>
                         </header>
 
-                        <section class="bg-white p-6 rounded-lg shadow-sm border">
-                            <h2 class="text-xl font-semibold text-center mb-6">1. データ入力</h2>
+                        <section class="mac-card p-8">
+                            <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">1. データ入力</h2>
                             <div class="flex flex-col items-center gap-3">
                                 <label for="csv-file-trimming"
-                                    class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2 px-5 border border-slate-300 rounded-md shadow-sm transition-colors">
+                                    class="cursor-pointer btn-gradient-primary text-white font-medium py-2 px-6 rounded-full mac-shadow transition-transform active:scale-95 text-sm">
                                     ファイルを選択
                                 </label>
                                 <input type="file" id="csv-file-trimming" class="hidden" accept=".csv">
-                                <p id="file-name-trimming" class="text-sm text-slate-500 mt-2">ファイルが選択されていません</p>
+                                <p id="file-name-trimming" class="text-sm text-gray-500 mt-2">ファイルが選択されていません</p>
                             </div>
                         </section>
 
-                        <section id="trimming-ui" class="hidden bg-white p-6 rounded-lg shadow-sm border">
-                            <h2 class="text-xl font-semibold text-center mb-6">2. 範囲選択</h2>
+                        <section id="trimming-ui" class="hidden mac-card p-8">
+                            <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">2. 範囲選択</h2>
 
                             <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
                                 <div class="lg:col-span-1 space-y-6">
                                     <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-2">表示設定</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">表示設定</label>
                                         <div class="flex items-center mb-2">
                                             <input type="checkbox" id="trimming-downsample"
-                                                class="h-4 w-4 text-blue-600 rounded border-slate-300">
+                                                class="h-4 w-4 text-blue-500 rounded border-gray-300 focus:ring-blue-500 focus:ring-offset-0">
                                             <label for="trimming-downsample"
-                                                class="ml-2 text-sm text-slate-700">描画をダウンサンプリング</label>
+                                                class="ml-2 text-sm text-gray-700">描画をダウンサンプリング</label>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-2">剛体選択</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">剛体選択</label>
                                         <select id="trimming-rigidbody-select"
-                                            class="block w-full text-sm border-slate-300 rounded-md shadow-sm p-2">
+                                            class="block w-full text-sm modern-input rounded-xl p-2 focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             <option value="all">すべて表示</option>
                                         </select>
                                     </div>
 
-                                    <div class="p-4 bg-slate-50 rounded border">
+                                    <div class="p-4 bg-gray-50/50 rounded-xl border border-gray-100">
                                         <label
-                                            class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">選択範囲
+                                            class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">選択範囲
                                             (秒)</label>
                                         <div class="space-y-3">
                                             <div>
-                                                <label class="block text-xs text-slate-400">開始 (Start)</label>
+                                                <label class="block text-[11px] text-gray-400 mb-1">開始 (Start)</label>
                                                 <input type="number" id="trim-start-time"
-                                                    class="block w-full text-sm border-slate-300 rounded-md p-1.5"
+                                                    class="block w-full text-sm border-gray-200 rounded-lg p-2 focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow"
                                                     step="0.001">
                                             </div>
                                             <div>
-                                                <label class="block text-xs text-slate-400">終了 (End)</label>
+                                                <label class="block text-[11px] text-gray-400 mb-1">終了 (End)</label>
                                                 <input type="number" id="trim-end-time"
-                                                    class="block w-full text-sm border-slate-300 rounded-md p-1.5"
+                                                    class="block w-full text-sm border-gray-200 rounded-lg p-2 focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow"
                                                     step="0.001">
                                             </div>
                                             <div>
-                                                <label class="block text-xs text-slate-400">期間 (Duration)</label>
+                                                <label class="block text-[11px] text-gray-400 mb-1">期間 (Duration)</label>
                                                 <input type="number" id="trim-duration"
-                                                    class="block w-full text-sm border-slate-300 rounded-md p-1.5 bg-slate-100"
+                                                    class="block w-full text-sm border-gray-200 rounded-lg p-2 bg-gray-100/50 text-gray-500 cursor-not-allowed"
                                                     readonly>
                                             </div>
                                             <button id="reset-zoom-trimming"
-                                                class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 py-1.5 rounded text-xs font-medium">ズームリセット</button>
+                                                class="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 py-2 rounded-lg text-xs font-medium transition-colors mac-shadow">ズームリセット</button>
                                         </div>
                                     </div>
 
                                     <button id="export-trimmed-csv"
-                                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded shadow-sm">
+                                        class="w-full btn-gradient-primary text-white font-medium py-3 px-4 rounded-xl mac-shadow transition-transform active:scale-95">
                                         選択範囲をエクスポート
                                     </button>
                                 </div>
@@ -509,51 +561,51 @@
                 <div class="page" id="data-analysis">
                     <div class="max-w-7xl mx-auto space-y-8">
                         <header class="text-center">
-                            <h1 class="text-3xl font-bold text-slate-800">データ解析ツール</h1>
-                            <p class="text-slate-500 mt-2">CSVファイルをアップロードして、剛体の運動を解析します。</p>
+                            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">データ解析ツール</h1>
+                            <p class="text-gray-500 mt-2 font-medium">CSVファイルをアップロードして、剛体の運動を解析します。</p>
                         </header>
 
-                        <section class="bg-white p-6 rounded-lg shadow-sm border">
-                            <h2 class="text-xl font-semibold text-center mb-6">1. データ入力</h2>
+                        <section class="mac-card p-8">
+                            <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">1. データ入力</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                 <div>
-                                    <label for="csv-files" class="block text-sm font-medium text-slate-700 mb-2">①
+                                    <label for="csv-files" class="block text-sm font-medium text-gray-700 mb-2">①
                                         CSVファイルを追加</label>
                                     <div class="flex items-center space-x-2">
                                         <input type="file" id="csv-files" multiple accept=".csv" class="hidden">
                                         <label for="csv-files"
-                                            class="w-full cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-md text-sm text-center">ファイルを追加</label>
+                                            class="w-full cursor-pointer btn-gradient-primary text-white font-medium py-2 px-4 rounded-full text-sm text-center mac-shadow transition-transform active:scale-95">ファイルを追加</label>
                                         <button id="clear-files-btn"
-                                            class="flex-shrink-0 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-3 rounded-md text-xs shadow-sm">クリア</button>
+                                            class="flex-shrink-0 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 font-medium py-2 px-4 rounded-full text-xs transition-colors mac-shadow">クリア</button>
                                     </div>
                                     <div id="file-list" class="mt-4 space-y-2"></div>
                                     <div
-                                        class="mt-4 p-3 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 text-xs rounded-r-lg">
+                                        class="mt-4 p-3 bg-yellow-50 border border-yellow-200 text-yellow-800 text-xs rounded-lg shadow-sm">
                                         <strong>注意:</strong>
                                         1分以上のデータは処理に時間がかかることがあります。また、直線運動以外の複雑な動作では、動作区間が誤って検出される可能性があります。
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-2">② 元データの単位</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">② 元データの単位</label>
                                     <div class="flex items-center space-x-4 mt-2">
                                         <label class="flex items-center">
-                                            <input type="radio" name="data-unit" value="mm" class="form-radio" checked>
-                                            <span class="ml-2 text-sm">mm</span>
+                                            <input type="radio" name="data-unit" value="mm" class="form-radio text-blue-500 focus:ring-blue-500 focus:ring-offset-0" checked>
+                                            <span class="ml-2 text-sm text-gray-700">mm</span>
                                         </label>
                                         <label class="flex items-center">
-                                            <input type="radio" name="data-unit" value="m" class="form-radio">
-                                            <span class="ml-2 text-sm">m</span>
+                                            <input type="radio" name="data-unit" value="m" class="form-radio text-blue-500 focus:ring-blue-500 focus:ring-offset-0">
+                                            <span class="ml-2 text-sm text-gray-700">m</span>
                                         </label>
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-2">③④ 方向の定義</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">③④ 方向の定義</label>
                                     <div class="flex space-x-4">
                                         <div class="flex-1">
                                             <label for="travel-axis"
-                                                class="block text-xs font-medium text-slate-500">進行方向</label>
+                                                class="block text-[11px] font-medium text-gray-500 mb-1">進行方向</label>
                                             <select id="travel-axis"
-                                                class="mt-1 w-full bg-white border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                                class="w-full bg-white modern-input rounded-xl py-2 px-3 focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow text-sm">
                                                 <option value="X">X</option>
                                                 <option value="Y">Y</option>
                                                 <option value="Z" selected>Z</option>
@@ -561,9 +613,9 @@
                                         </div>
                                         <div class="flex-1">
                                             <label for="vertical-axis"
-                                                class="block text-xs font-medium text-slate-500">鉛直方向</label>
+                                                class="block text-[11px] font-medium text-gray-500 mb-1">鉛直方向</label>
                                             <select id="vertical-axis"
-                                                class="mt-1 w-full bg-white border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                                class="w-full bg-white modern-input rounded-xl py-2 px-3 focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow text-sm">
                                                 <option value="X">X</option>
                                                 <option value="Y" selected>Y</option>
                                                 <option value="Z">Z</option>
@@ -572,15 +624,15 @@
                                     </div>
                                 </div>
                                 <div class="md:col-span-2">
-                                    <details class="bg-slate-50/70 border rounded-md p-4">
-                                        <summary class="font-medium text-slate-700 text-sm">動作検出の高度な設定</summary>
-                                        <div class="mt-4 pt-4 border-t">
+                                    <details class="bg-gray-50/50 border border-gray-100 rounded-xl p-4 transition-all">
+                                        <summary class="font-medium text-gray-700 text-sm cursor-pointer outline-none select-none">動作検出の高度な設定</summary>
+                                        <div class="mt-4 pt-4 border-t border-gray-200/60">
                                             <label for="motion-threshold-multiplier"
-                                                class="block text-sm font-medium text-slate-600">静止範囲の倍率</label>
+                                                class="block text-sm font-medium text-gray-700">静止範囲の倍率</label>
                                             <input type="number" id="motion-threshold-multiplier" value="0.001"
                                                 step="0.001"
-                                                class="mt-1 block w-full rounded-md shadow-sm p-2 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
-                                            <p class="text-xs text-slate-500 mt-1">
+                                                class="mt-1 block w-full rounded-lg shadow-sm p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
+                                            <p class="text-[11px] text-gray-500 mt-2">
                                                 データ全体の振れ幅(最大値-最小値)にこの倍率を掛けた値を、静止範囲のマージンとして使用します。</p>
                                         </div>
                                     </details>
@@ -589,190 +641,189 @@
                         </section>
 
                         <section id="rigidbody-selection-section"
-                            class="bg-white p-6 rounded-lg shadow-sm border hidden">
-                            <h2 class="text-xl font-semibold text-center mb-6">2. 解析対象の剛体を選択</h2>
+                            class="mac-card p-8 hidden">
+                            <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">2. 解析対象の剛体を選択</h2>
                             <div id="rigidbody-list" class="space-y-4"></div>
-                            <div class="mt-6 text-center">
+                            <div class="mt-8 text-center">
                                 <button id="start-analysis-btn"
-                                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-8 rounded-md shadow-sm transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    class="btn-gradient-primary text-white font-medium py-3 px-10 rounded-full transition-all active:scale-95">
                                     解析開始
                                 </button>
                             </div>
                         </section>
 
                         <div id="results-section" class="hidden space-y-8">
-                            <section class="bg-white p-6 rounded-lg shadow-sm border">
-                                <h2 class="text-xl font-semibold text-center mb-6">3. 解析結果</h2>
-                                <div id="avg-velo-filter-section" class="mb-6 p-4 bg-slate-50/70 rounded-md border">
-                                    <h4 class="font-medium text-slate-700 mb-3 text-sm">平均速度の計算設定</h4>
+                            <section class="mac-card p-8">
+                                <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">3. 解析結果</h2>
+                                <div id="avg-velo-filter-section" class="mb-6 p-5 bg-gray-50/50 rounded-xl border border-gray-100">
+                                    <h4 class="font-semibold text-gray-700 mb-4 text-sm">平均速度の計算設定</h4>
                                     <div class="flex items-center space-x-3"><input type="checkbox"
                                             id="filter-velocity-checkbox"
-                                            class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"><label
+                                            class="h-4 w-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500 focus:ring-offset-0"><label
                                             for="filter-velocity-checkbox"
-                                            class="text-sm font-medium text-slate-700">微小な速度を計算から除外する</label></div>
-                                    <div id="filter-range-inputs" class="hidden mt-3 flex items-center space-x-4 pl-7">
+                                            class="text-sm font-medium text-gray-700">微小な速度を計算から除外する</label></div>
+                                    <div id="filter-range-inputs" class="hidden mt-4 flex items-center space-x-4 pl-7">
                                         <div><label for="filter-lower-bound"
-                                                class="block text-xs font-medium text-slate-600">下限値 (m/s)</label><input
+                                                class="block text-[11px] font-medium text-gray-500 mb-1">下限値 (m/s)</label><input
                                                 type="number" id="filter-lower-bound" value="-0.01" step="0.01"
-                                                class="mt-1 block w-32 rounded-md shadow-sm p-1.5 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                                class="block w-32 rounded-lg shadow-sm p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                         </div>
                                         <div><label for="filter-upper-bound"
-                                                class="block text-xs font-medium text-slate-600">上限値 (m/s)</label><input
+                                                class="block text-[11px] font-medium text-gray-500 mb-1">上限値 (m/s)</label><input
                                                 type="number" id="filter-upper-bound" value="0.01" step="0.01"
-                                                class="mt-1 block w-32 rounded-md shadow-sm p-1.5 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                                class="block w-32 rounded-lg shadow-sm p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                         </div>
                                         <div class="pt-5"><button id="recalculate-avg-btn"
-                                                class="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-1 px-3 rounded-md text-xs shadow-sm">再計算</button>
+                                                class="bg-gray-800 hover:bg-gray-700 text-white font-medium py-1.5 px-4 rounded-lg text-xs mac-shadow transition-transform active:scale-95">再計算</button>
                                         </div>
                                     </div>
                                 </div>
                                 <div id="average-velocities" class="mb-6"></div>
-                                <p class="text-xs text-slate-500 mb-4">※平均速度及び平均スリップ率は、静止範囲として設定している倍率により大きく変動します。</p>
+                                <p class="text-xs text-gray-500 mb-6">※平均速度及び平均スリップ率は、静止範囲として設定している倍率により大きく変動します。</p>
                                 <button id="download-velocity-csv"
-                                    class="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded-md shadow-sm text-sm">微小速度データをCSVでダウンロード</button>
+                                    class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 font-medium py-2 px-5 rounded-full mac-shadow text-sm transition-colors">微小速度データをCSVでダウンロード</button>
                             </section>
 
-                            <section class="bg-white p-6 rounded-lg shadow-sm border">
-                                <div class="flex flex-wrap justify-between items-center mb-6 text-center border-b pb-4">
-                                    <h2 class="text-xl font-semibold w-full sm:w-auto text-center sm:text-left">4. グラフ
+                            <section class="mac-card p-8">
+                                <div class="flex flex-wrap justify-between items-center mb-6 text-center border-b border-gray-100 pb-4">
+                                    <h2 class="text-lg font-semibold w-full sm:w-auto text-center sm:text-left text-gray-800">4. グラフ
                                     </h2>
-                                    <div class="flex items-center space-x-2 mt-4 sm:mt-0 mx-auto sm:mx-0">
-                                        <span class="text-sm text-slate-600">スタイル:</span>
+                                    <div class="flex items-center space-x-2 mt-4 sm:mt-0 mx-auto sm:mx-0 bg-gray-100/80 p-1 rounded-lg border border-gray-200/60">
                                         <button id="style-casual"
-                                            class="style-btn bg-blue-600 text-white px-3 py-1 rounded-l-md text-sm font-medium">カジュアル</button>
+                                            class="style-btn bg-white text-gray-900 px-4 py-1 rounded-md text-sm font-medium shadow-sm border border-gray-200/50 transition-all">カジュアル</button>
                                         <button id="style-formal"
-                                            class="style-btn bg-slate-200 text-slate-700 px-3 py-1 rounded-r-md text-sm font-medium">フォーマル</button>
+                                            class="style-btn bg-transparent text-gray-600 hover:text-gray-900 px-4 py-1 rounded-md text-sm font-medium transition-all">フォーマル</button>
                                     </div>
                                 </div>
                                 <div id="graph-customization" class="mt-6">
-                                    <div class="mb-8 p-4 bg-slate-50/70 rounded-md border">
-                                        <h4 class="font-medium text-slate-700 mb-3 text-sm">グラフ描画設定</h4>
-                                        <div class="flex items-center flex-wrap gap-x-6 gap-y-3">
-                                            <div class="flex items-center space-x-2">
+                                    <div class="mb-8 p-5 bg-gray-50/50 rounded-xl border border-gray-100">
+                                        <h4 class="font-semibold text-gray-700 mb-4 text-sm">グラフ描画設定</h4>
+                                        <div class="flex items-center flex-wrap gap-x-6 gap-y-4">
+                                            <div class="flex items-center space-x-3">
                                                 <label for="lowpass-filter-type"
-                                                    class="text-sm font-medium text-slate-700">ローパスフィルタ:</label>
+                                                    class="text-sm font-medium text-gray-700">ローパスフィルタ:</label>
                                                 <select id="lowpass-filter-type"
-                                                    class="block w-36 rounded-md shadow-sm p-1.5 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                                    class="block w-40 rounded-lg shadow-sm p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                                     <option value="none" selected>適用しない</option>
                                                     <option value="moving-average">移動平均</option>
                                                     <option value="gaussian">ガウシアン</option>
                                                 </select>
                                             </div>
-                                            <div class="flex items-center space-x-2">
+                                            <div class="flex items-center space-x-3">
                                                 <label id="lowpass-strength-label" for="lowpass-strength"
-                                                    class="text-sm font-medium text-slate-700">強度:</label>
+                                                    class="text-sm font-medium text-gray-700">強度:</label>
                                                 <input type="number" id="lowpass-strength" value="10" step="0.1"
-                                                    class="block w-20 rounded-md shadow-sm p-1.5 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                                    class="block w-24 rounded-lg shadow-sm p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow disabled:bg-gray-100 disabled:text-gray-400"
                                                     disabled>
                                             </div>
                                             <button id="redraw-charts-btn"
-                                                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md shadow-sm transition-all duration-150">再描画</button>
+                                                class="btn-gradient-primary text-white font-medium py-2 px-5 rounded-lg mac-shadow transition-transform active:scale-95">再描画</button>
                                         </div>
-                                        <p id="filter-description" class="text-xs text-slate-500 mt-2">
+                                        <p id="filter-description" class="text-[11px] text-gray-500 mt-3">
                                             フィルタを選択すると、強度を指定できます。</p>
                                     </div>
-                                    <div class="mb-8 p-4 bg-slate-50/70 rounded-md border">
-                                        <h4 class="font-medium text-slate-700 mb-3 text-sm">エクスポート設定</h4>
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="mb-8 p-5 bg-gray-50/50 rounded-xl border border-gray-100">
+                                        <h4 class="font-semibold text-gray-700 mb-4 text-sm">エクスポート設定</h4>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div><label for="export-width"
-                                                    class="block text-sm font-medium text-slate-600">画像の幅
+                                                    class="block text-[11px] font-medium text-gray-500 mb-1">画像の幅
                                                     (px)</label><input type="number" id="export-width" value="800"
                                                     step="100"
-                                                    class="mt-1 block w-full rounded-md shadow-sm p-2 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                                    class="block w-full rounded-lg shadow-sm p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             </div>
                                             <div><label for="export-height"
-                                                    class="block text-sm font-medium text-slate-600">画像の高さ
+                                                    class="block text-[11px] font-medium text-gray-500 mb-1">画像の高さ
                                                     (px)</label><input type="number" id="export-height" value="450"
                                                     step="100"
-                                                    class="mt-1 block w-full rounded-md shadow-sm p-2 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                                    class="block w-full rounded-lg shadow-sm p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             </div>
                                         </div>
                                     </div>
-                                    <h3 class="text-lg font-semibold mb-4 text-slate-700">グラフのラベル編集</h3>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                        <div class="space-y-2 p-3 border rounded-md bg-slate-50/50">
-                                            <h4 class="font-semibold text-center text-slate-700 text-sm">速度 vs 距離</h4>
-                                            <div><label class="text-xs font-medium text-slate-600">タイトル</label><input
+                                    <h3 class="text-base font-semibold mb-4 text-gray-800">グラフのラベル編集</h3>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                        <div class="space-y-3 p-4 border border-gray-100 rounded-xl bg-gray-50/50">
+                                            <h4 class="font-semibold text-center text-gray-700 text-[13px]">速度 vs 距離</h4>
+                                            <div><label class="text-[11px] font-medium text-gray-500 mb-1 block">タイトル</label><input
                                                     type="text" id="v-chart-title" data-chart-id="velocity-chart"
                                                     data-label-type="title"
-                                                    class="chart-label-input mt-1 w-full rounded-md p-1.5 text-sm border-slate-300">
+                                                    class="chart-label-input w-full rounded-lg p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             </div>
-                                            <div><label class="text-xs font-medium text-slate-600">X軸</label><input
+                                            <div><label class="text-[11px] font-medium text-gray-500 mb-1 block">X軸</label><input
                                                     type="text" id="v-chart-xlabel" data-chart-id="velocity-chart"
                                                     data-label-type="x"
-                                                    class="chart-label-input mt-1 w-full rounded-md p-1.5 text-sm border-slate-300">
+                                                    class="chart-label-input w-full rounded-lg p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             </div>
-                                            <div><label class="text-xs font-medium text-slate-600">Y軸</label><input
+                                            <div><label class="text-[11px] font-medium text-gray-500 mb-1 block">Y軸</label><input
                                                     type="text" id="v-chart-ylabel" data-chart-id="velocity-chart"
                                                     data-label-type="y"
-                                                    class="chart-label-input mt-1 w-full rounded-md p-1.5 text-sm border-slate-300">
+                                                    class="chart-label-input w-full rounded-lg p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             </div>
                                         </div>
-                                        <div class="space-y-2 p-3 border rounded-md bg-slate-50/50">
-                                            <h4 class="font-semibold text-center text-slate-700 text-sm">スリップ率 vs 距離
+                                        <div class="space-y-3 p-4 border border-gray-100 rounded-xl bg-gray-50/50">
+                                            <h4 class="font-semibold text-center text-gray-700 text-[13px]">スリップ率 vs 距離
                                             </h4>
-                                            <div><label class="text-xs font-medium text-slate-600">タイトル</label><input
+                                            <div><label class="text-[11px] font-medium text-gray-500 mb-1 block">タイトル</label><input
                                                     type="text" id="s-chart-title" data-chart-id="slip-chart"
                                                     data-label-type="title"
-                                                    class="chart-label-input mt-1 w-full rounded-md p-1.5 text-sm border-slate-300">
+                                                    class="chart-label-input w-full rounded-lg p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             </div>
-                                            <div><label class="text-xs font-medium text-slate-600">X軸</label><input
+                                            <div><label class="text-[11px] font-medium text-gray-500 mb-1 block">X軸</label><input
                                                     type="text" id="s-chart-xlabel" data-chart-id="slip-chart"
                                                     data-label-type="x"
-                                                    class="chart-label-input mt-1 w-full rounded-md p-1.5 text-sm border-slate-300">
+                                                    class="chart-label-input w-full rounded-lg p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             </div>
-                                            <div><label class="text-xs font-medium text-slate-600">Y軸</label><input
+                                            <div><label class="text-[11px] font-medium text-gray-500 mb-1 block">Y軸</label><input
                                                     type="text" id="s-chart-ylabel" data-chart-id="slip-chart"
                                                     data-label-type="y"
-                                                    class="chart-label-input mt-1 w-full rounded-md p-1.5 text-sm border-slate-300">
+                                                    class="chart-label-input w-full rounded-lg p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             </div>
                                         </div>
-                                        <div class="space-y-2 p-3 border rounded-md bg-slate-50/50">
-                                            <h4 class="font-semibold text-center text-slate-700 text-sm">鉛直変位 vs 距離</h4>
-                                            <div><label class="text-xs font-medium text-slate-600">タイトル</label><input
+                                        <div class="space-y-3 p-4 border border-gray-100 rounded-xl bg-gray-50/50">
+                                            <h4 class="font-semibold text-center text-gray-700 text-[13px]">鉛直変位 vs 距離</h4>
+                                            <div><label class="text-[11px] font-medium text-gray-500 mb-1 block">タイトル</label><input
                                                     type="text" id="z-chart-title" data-chart-id="vertical-chart"
                                                     data-label-type="title"
-                                                    class="chart-label-input mt-1 w-full rounded-md p-1.5 text-sm border-slate-300">
+                                                    class="chart-label-input w-full rounded-lg p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             </div>
-                                            <div><label class="text-xs font-medium text-slate-600">X軸</label><input
+                                            <div><label class="text-[11px] font-medium text-gray-500 mb-1 block">X軸</label><input
                                                     type="text" id="z-chart-xlabel" data-chart-id="vertical-chart"
                                                     data-label-type="x"
-                                                    class="chart-label-input mt-1 w-full rounded-md p-1.5 text-sm border-slate-300">
+                                                    class="chart-label-input w-full rounded-lg p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             </div>
-                                            <div><label class="text-xs font-medium text-slate-600">Y軸</label><input
+                                            <div><label class="text-[11px] font-medium text-gray-500 mb-1 block">Y軸</label><input
                                                     type="text" id="z-chart-ylabel" data-chart-id="vertical-chart"
                                                     data-label-type="y"
-                                                    class="chart-label-input mt-1 w-full rounded-md p-1.5 text-sm border-slate-300">
+                                                    class="chart-label-input w-full rounded-lg p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             </div>
                                         </div>
-                                        <div class="space-y-2 p-3 border rounded-md bg-slate-50/50">
-                                            <h4 class="font-semibold text-center text-slate-700 text-sm">平面移動軌跡</h4>
-                                            <div><label class="text-xs font-medium text-slate-600">タイトル</label><input
+                                        <div class="space-y-3 p-4 border border-gray-100 rounded-xl bg-gray-50/50">
+                                            <h4 class="font-semibold text-center text-gray-700 text-[13px]">平面移動軌跡</h4>
+                                            <div><label class="text-[11px] font-medium text-gray-500 mb-1 block">タイトル</label><input
                                                     type="text" id="t-chart-title" data-chart-id="trajectory-chart"
                                                     data-label-type="title"
-                                                    class="chart-label-input mt-1 w-full rounded-md p-1.5 text-sm border-slate-300">
+                                                    class="chart-label-input w-full rounded-lg p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             </div>
-                                            <div><label class="text-xs font-medium text-slate-600">X軸</label><input
+                                            <div><label class="text-[11px] font-medium text-gray-500 mb-1 block">X軸</label><input
                                                     type="text" id="t-chart-xlabel" data-chart-id="trajectory-chart"
                                                     data-label-type="x"
-                                                    class="chart-label-input mt-1 w-full rounded-md p-1.5 text-sm border-slate-300">
+                                                    class="chart-label-input w-full rounded-lg p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             </div>
-                                            <div><label class="text-xs font-medium text-slate-600">Y軸</label><input
+                                            <div><label class="text-[11px] font-medium text-gray-500 mb-1 block">Y軸</label><input
                                                     type="text" id="t-chart-ylabel" data-chart-id="trajectory-chart"
                                                     data-label-type="y"
-                                                    class="chart-label-input mt-1 w-full rounded-md p-1.5 text-sm border-slate-300">
+                                                    class="chart-label-input w-full rounded-lg p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-12 mt-8">
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-12 mt-10">
                                     <div>
-                                        <div class="w-full aspect-video bg-white p-2 border rounded-lg shadow-sm">
+                                        <div class="w-full aspect-video bg-white p-3 border border-gray-100 rounded-2xl shadow-sm">
                                             <div class="chart-container"><canvas id="velocity-chart"></canvas></div>
                                         </div>
-                                        <div class="text-center mt-3 flex justify-center items-center space-x-2">
+                                        <div class="text-center mt-4 flex justify-center items-center space-x-3">
                                             <button
-                                                class="zoom-btn bg-slate-200 hover:bg-slate-300 text-slate-600 h-8 w-8 flex items-center justify-center rounded-md transition-colors"
+                                                class="zoom-btn bg-gray-100 hover:bg-gray-200 text-gray-700 h-8 w-8 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                                 data-chart-id="velocity-chart" title="拡大表示">
                                                 <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -781,20 +832,20 @@
                                                 </svg>
                                             </button>
                                             <button
-                                                class="download-btn bg-slate-600 hover:bg-slate-700 text-white text-xs h-8 px-3 flex items-center justify-center rounded-md"
+                                                class="download-btn bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs h-8 px-4 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                                 data-chart-id="velocity-chart" data-format="png">PNG</button>
                                             <button
-                                                class="download-btn bg-slate-600 hover:bg-slate-700 text-white text-xs h-8 px-3 flex items-center justify-center rounded-md"
+                                                class="download-btn bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs h-8 px-4 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                                 data-chart-id="velocity-chart" data-format="pdf">PDF</button>
                                         </div>
                                     </div>
                                     <div>
-                                        <div class="w-full aspect-video bg-white p-2 border rounded-lg shadow-sm">
+                                        <div class="w-full aspect-video bg-white p-3 border border-gray-100 rounded-2xl shadow-sm">
                                             <div class="chart-container"><canvas id="slip-chart"></canvas></div>
                                         </div>
-                                        <div class="text-center mt-3 flex justify-center items-center space-x-2">
+                                        <div class="text-center mt-4 flex justify-center items-center space-x-3">
                                             <button
-                                                class="zoom-btn bg-slate-200 hover:bg-slate-300 text-slate-600 h-8 w-8 flex items-center justify-center rounded-md transition-colors"
+                                                class="zoom-btn bg-gray-100 hover:bg-gray-200 text-gray-700 h-8 w-8 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                                 data-chart-id="slip-chart" title="拡大表示">
                                                 <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -803,20 +854,20 @@
                                                 </svg>
                                             </button>
                                             <button
-                                                class="download-btn bg-slate-600 hover:bg-slate-700 text-white text-xs h-8 px-3 flex items-center justify-center rounded-md"
+                                                class="download-btn bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs h-8 px-4 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                                 data-chart-id="slip-chart" data-format="png">PNG</button>
                                             <button
-                                                class="download-btn bg-slate-600 hover:bg-slate-700 text-white text-xs h-8 px-3 flex items-center justify-center rounded-md"
+                                                class="download-btn bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs h-8 px-4 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                                 data-chart-id="slip-chart" data-format="pdf">PDF</button>
                                         </div>
                                     </div>
                                     <div>
-                                        <div class="w-full aspect-video bg-white p-2 border rounded-lg shadow-sm">
+                                        <div class="w-full aspect-video bg-white p-3 border border-gray-100 rounded-2xl shadow-sm">
                                             <div class="chart-container"><canvas id="vertical-chart"></canvas></div>
                                         </div>
-                                        <div class="text-center mt-3 flex justify-center items-center space-x-2">
+                                        <div class="text-center mt-4 flex justify-center items-center space-x-3">
                                             <button
-                                                class="zoom-btn bg-slate-200 hover:bg-slate-300 text-slate-600 h-8 w-8 flex items-center justify-center rounded-md transition-colors"
+                                                class="zoom-btn bg-gray-100 hover:bg-gray-200 text-gray-700 h-8 w-8 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                                 data-chart-id="vertical-chart" title="拡大表示">
                                                 <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -825,20 +876,20 @@
                                                 </svg>
                                             </button>
                                             <button
-                                                class="download-btn bg-slate-600 hover:bg-slate-700 text-white text-xs h-8 px-3 flex items-center justify-center rounded-md"
+                                                class="download-btn bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs h-8 px-4 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                                 data-chart-id="vertical-chart" data-format="png">PNG</button>
                                             <button
-                                                class="download-btn bg-slate-600 hover:bg-slate-700 text-white text-xs h-8 px-3 flex items-center justify-center rounded-md"
+                                                class="download-btn bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs h-8 px-4 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                                 data-chart-id="vertical-chart" data-format="pdf">PDF</button>
                                         </div>
                                     </div>
                                     <div>
-                                        <div class="w-full aspect-video bg-white p-2 border rounded-lg shadow-sm">
+                                        <div class="w-full aspect-video bg-white p-3 border border-gray-100 rounded-2xl shadow-sm">
                                             <div class="chart-container"><canvas id="trajectory-chart"></canvas></div>
                                         </div>
-                                        <div class="text-center mt-3 flex justify-center items-center space-x-2">
+                                        <div class="text-center mt-4 flex justify-center items-center space-x-3">
                                             <button
-                                                class="zoom-btn bg-slate-200 hover:bg-slate-300 text-slate-600 h-8 w-8 flex items-center justify-center rounded-md transition-colors"
+                                                class="zoom-btn bg-gray-100 hover:bg-gray-200 text-gray-700 h-8 w-8 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                                 data-chart-id="trajectory-chart" title="拡大表示">
                                                 <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -847,10 +898,10 @@
                                                 </svg>
                                             </button>
                                             <button
-                                                class="download-btn bg-slate-600 hover:bg-slate-700 text-white text-xs h-8 px-3 flex items-center justify-center rounded-md"
+                                                class="download-btn bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs h-8 px-4 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                                 data-chart-id="trajectory-chart" data-format="png">PNG</button>
                                             <button
-                                                class="download-btn bg-slate-600 hover:bg-slate-700 text-white text-xs h-8 px-3 flex items-center justify-center rounded-md"
+                                                class="download-btn bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs h-8 px-4 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                                 data-chart-id="trajectory-chart" data-format="pdf">PDF</button>
                                         </div>
                                     </div>
@@ -863,82 +914,82 @@
                 <div class="page" id="wide-area-analysis">
                     <div class="max-w-7xl mx-auto space-y-8">
                         <header class="text-center">
-                            <h1 class="text-3xl font-bold text-slate-800">広域解析ツール</h1>
-                            <p class="text-slate-500 mt-2">CSVファイルをアップロードして、広範囲の移動軌跡や滞在傾向を可視化します。</p>
+                            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">広域解析ツール</h1>
+                            <p class="text-gray-500 mt-2 font-medium">CSVファイルをアップロードして、広範囲の移動軌跡や滞在傾向を可視化します。</p>
                         </header>
 
-                        <section id="settings-card-wide" class="bg-white p-6 rounded-lg shadow-sm border">
-                            <h2 class="text-xl font-semibold text-center mb-6">1. 設定</h2>
+                        <section id="settings-card-wide" class="mac-card p-8">
+                            <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">1. 設定</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div>
-                                    <label for="csv-files-wide" class="block text-sm font-medium text-slate-700 mb-2">①
+                                    <label for="csv-files-wide" class="block text-sm font-medium text-gray-700 mb-2">①
                                         CSVファイルを追加</label>
                                     <div class="flex items-center space-x-2">
                                         <input type="file" id="csv-files-wide" multiple accept=".csv" class="hidden">
                                         <label for="csv-files-wide"
-                                            class="w-full cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-md text-sm text-center">ファイルを追加</label>
+                                            class="w-full cursor-pointer btn-gradient-primary text-white font-medium py-2 px-4 rounded-full text-sm text-center mac-shadow transition-transform active:scale-95">ファイルを追加</label>
                                         <button id="clear-files-btn-wide"
-                                            class="flex-shrink-0 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-3 rounded-md text-xs shadow-sm">クリア</button>
+                                            class="flex-shrink-0 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 font-medium py-2 px-4 rounded-full text-xs transition-colors mac-shadow">クリア</button>
                                     </div>
                                     <div id="file-list-area-wide" class="mt-4 space-y-2"></div>
                                 </div>
                                 <div class="space-y-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-2">② 元データの単位</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">② 元データの単位</label>
                                         <div class="flex items-center space-x-4 mt-2">
                                             <label class="flex items-center"><input type="radio" name="data-unit-wide"
-                                                    value="mm" class="form-radio" checked> <span
-                                                    class="ml-2 text-sm">mm</span></label>
+                                                    value="mm" class="form-radio text-blue-500 focus:ring-blue-500 focus:ring-offset-0" checked> <span
+                                                    class="ml-2 text-sm text-gray-700">mm</span></label>
                                             <label class="flex items-center"><input type="radio" name="data-unit-wide"
-                                                    value="m" class="form-radio"> <span
-                                                    class="ml-2 text-sm">m</span></label>
+                                                    value="m" class="form-radio text-blue-500 focus:ring-blue-500 focus:ring-offset-0"> <span
+                                                    class="ml-2 text-sm text-gray-700">m</span></label>
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-2">③ データ取得間隔</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">③ データ取得間隔</label>
                                         <select id="sampling-mode-wide"
-                                            class="block w-full mb-2 bg-white border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm">
+                                            class="block w-full mb-2 bg-white modern-input rounded-xl py-2 px-3 focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow text-sm">
                                             <option value="seconds" selected>秒数で指定</option>
                                             <option value="frames">フレーム数で指定</option>
                                             <option value="none">ダウンサンプリングしない</option>
                                         </select>
 
                                         <div id="sampling-seconds-container">
-                                            <label for="sampling-rate-wide" class="block text-xs text-slate-500 mb-1">間隔
+                                            <label for="sampling-rate-wide" class="block text-[11px] font-medium text-gray-500 mb-1">間隔
                                                 (秒)</label>
                                             <input type="number" id="sampling-rate-wide" value="0.1" step="0.01"
                                                 min="0.01"
-                                                class="block w-full rounded-md shadow-sm p-2 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500">
+                                                class="block w-full rounded-lg shadow-sm p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                         </div>
 
                                         <div id="sampling-frames-container" class="hidden">
                                             <label for="sampling-frames-wide"
-                                                class="block text-xs text-slate-500 mb-1">間隔 (フレーム)</label>
+                                                class="block text-[11px] font-medium text-gray-500 mb-1">間隔 (フレーム)</label>
                                             <input type="number" id="sampling-frames-wide" value="10" step="1" min="1"
-                                                class="block w-full rounded-md shadow-sm p-2 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500">
+                                                class="block w-full rounded-lg shadow-sm p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                         </div>
 
                                         <div id="sampling-warning-wide"
-                                            class="hidden mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+                                            class="hidden mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-xs text-yellow-800 shadow-sm">
                                             <strong>注意:</strong>
                                             データ量によっては処理落ちする可能性があります。<br>また、このモードでは3D軌跡機能は無効になります。
                                         </div>
                                     </div>
                                     <div>
                                         <label for="heatmap-grid-size-wide"
-                                            class="block text-sm font-medium text-slate-700 mb-2">④ ヒートマップのマス目のサイズ
+                                            class="block text-sm font-medium text-gray-700 mb-2">④ ヒートマップのマス目のサイズ
                                             (<span class="unit-label">mm</span>)</label>
                                         <input type="number" id="heatmap-grid-size-wide" value="200" step="100"
-                                            class="block w-full rounded-md shadow-sm p-2 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                            class="block w-full rounded-lg shadow-sm p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-2">⑤ 方向の定義</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">⑤ 方向の定義</label>
                                         <div class="space-y-3">
                                             <div>
                                                 <label for="vertical-axis-wide"
-                                                    class="block text-xs font-medium text-slate-500">鉛直方向の軸</label>
+                                                    class="block text-[11px] font-medium text-gray-500 mb-1">鉛直方向の軸</label>
                                                 <select id="vertical-axis-wide"
-                                                    class="mt-1 w-full bg-white border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                                    class="block w-full bg-white modern-input rounded-xl py-2 px-3 focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow text-sm">
                                                     <option value="X">X</option>
                                                     <option value="Y" selected>Y</option>
                                                     <option value="Z">Z</option>
@@ -946,38 +997,38 @@
                                             </div>
                                             <div class="flex items-center">
                                                 <input type="checkbox" id="invert-z-wide"
-                                                    class="h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+                                                    class="h-4 w-4 text-blue-500 rounded border-gray-300 focus:ring-blue-500 focus:ring-offset-0">
                                                 <label for="invert-z-wide"
-                                                    class="ml-2 text-sm text-slate-700">Z軸を反転する</label>
+                                                    class="ml-2 text-sm text-gray-700">Z軸を反転する</label>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div id="rigidbody-selection-area-wide" class="mt-6 hidden">
-                                <label class="block text-sm font-medium text-slate-700 mb-2">⑤ 解析対象の剛体を選択</label>
+                            <div id="rigidbody-selection-area-wide" class="mt-8 hidden">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">⑤ 解析対象の剛体を選択</label>
                                 <div id="rigidbody-list-container-wide"
-                                    class="space-y-4 p-4 border rounded-md bg-slate-50/70 max-h-60 overflow-y-auto">
+                                    class="space-y-4 p-4 border border-gray-100 rounded-xl bg-gray-50/50 max-h-60 overflow-y-auto">
                                 </div>
                             </div>
                             <div class="text-center mt-8">
                                 <button id="analyze-btn-wide"
-                                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-8 rounded-md shadow-sm transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-slate-400 disabled:cursor-not-allowed disabled:transform-none"
+                                    class="btn-gradient-primary text-white font-medium py-3 px-10 rounded-full transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                                     disabled>
                                     解析開始
                                 </button>
                             </div>
                         </section>
 
-                        <section id="results-card-wide" class="bg-white p-6 rounded-lg shadow-sm border hidden">
-                            <h2 class="text-xl font-semibold text-center mb-4">2. 解析結果</h2>
-                            <div class="flex justify-center mb-6 border-b">
+                        <section id="results-card-wide" class="mac-card p-8 hidden">
+                            <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">2. 解析結果</h2>
+                            <div class="flex justify-center mb-6 border-b border-gray-200">
                                 <button id="show-trajectory-btn-wide"
-                                    class="tab-btn active font-medium py-2 px-6 rounded-t-md transition-colors">軌跡</button>
+                                    class="tab-btn active font-medium py-2 px-6 transition-colors border-b-2 border-transparent hover:text-gray-900 focus:outline-none">軌跡</button>
                                 <button id="show-heatmap-btn-wide"
-                                    class="tab-btn font-medium py-2 px-6 rounded-t-md transition-colors">ヒートマップ</button>
+                                    class="tab-btn font-medium py-2 px-6 transition-colors border-b-2 border-transparent hover:text-gray-900 focus:outline-none text-gray-500">ヒートマップ</button>
                                 <button id="show-3d-trajectory-btn-wide"
-                                    class="tab-btn font-medium py-2 px-6 rounded-t-md transition-colors">3D軌跡</button>
+                                    class="tab-btn font-medium py-2 px-6 transition-colors border-b-2 border-transparent hover:text-gray-900 focus:outline-none text-gray-500">3D軌跡</button>
                             </div>
 
                             <div id="trajectory-view-wide">
@@ -989,119 +1040,119 @@
                                             <span class="ml-2 text-sm text-slate-700">高さ情報を含む</span>
                                         </label>
                                     </div>
-                                    <div class="aspect-square bg-white p-2 relative border rounded-lg shadow-sm">
+                                    <div class="aspect-square bg-white p-3 relative border border-gray-100 rounded-2xl shadow-sm">
                                         <div class="chart-container">
                                             <canvas id="trajectory-chart-wide"></canvas>
                                             <div id="height-legend-wide"
-                                                class="hidden absolute top-2 right-2 bg-white/80 backdrop-blur-sm p-2 rounded-md border text-xs">
-                                                <div class="font-semibold text-center text-slate-700 mb-1">高さ (m)</div>
+                                                class="hidden absolute top-2 right-2 bg-white/80 backdrop-blur-sm p-3 rounded-xl border border-gray-200 text-xs mac-shadow">
+                                                <div class="font-semibold text-center text-gray-700 mb-2">高さ (m)</div>
                                                 <div class="flex items-center space-x-2">
-                                                    <span id="height-legend-min-wide">0.0</span>
+                                                    <span id="height-legend-min-wide" class="text-gray-500">0.0</span>
                                                     <div id="height-legend-gradient-wide"
-                                                        class="w-20 h-3 rounded-sm border"></div>
-                                                    <span id="height-legend-max-wide">0.0</span>
+                                                        class="w-20 h-3 rounded-full border border-gray-200"></div>
+                                                    <span id="height-legend-max-wide" class="text-gray-500">0.0</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="text-center mt-4 flex justify-center items-center space-x-2">
+                                <div class="text-center mt-6 flex justify-center items-center space-x-3">
                                     <button
-                                        class="download-btn-wide bg-slate-600 hover:bg-slate-700 text-white text-sm h-9 px-4 flex items-center justify-center rounded-md"
+                                        class="download-btn-wide bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-sm h-10 px-5 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                         data-target="trajectory-chart-wide" data-format="png">PNGで保存</button>
                                     <button
-                                        class="download-btn-wide bg-slate-600 hover:bg-slate-700 text-white text-sm h-9 px-4 flex items-center justify-center rounded-md"
+                                        class="download-btn-wide bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-sm h-10 px-5 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                         data-target="trajectory-chart-wide" data-format="pdf">PDFで保存</button>
                                 </div>
                             </div>
 
                             <div id="heatmap-view-wide" class="hidden">
                                 <div id="heatmap-container-wide"
-                                    class="w-full max-w-2xl mx-auto aspect-square relative bg-slate-50 border rounded-lg shadow-sm">
+                                    class="w-full max-w-2xl mx-auto aspect-square relative bg-white border border-gray-100 rounded-2xl shadow-sm p-3">
                                     <canvas id="heatmap-canvas-wide"></canvas>
                                     <div id="heatmap-tooltip"
-                                        class="hidden absolute bg-black/70 text-white text-xs rounded-md px-2 py-1 pointer-events-none shadow-lg">
+                                        class="hidden absolute bg-black/80 backdrop-blur-md text-white text-xs rounded-lg px-3 py-2 pointer-events-none shadow-lg border border-white/10">
                                     </div>
                                 </div>
                                 <div id="heatmap-legend-wide"
-                                    class="flex justify-end items-center mt-2 max-w-2xl mx-auto space-x-2 text-sm">
+                                    class="flex justify-end items-center mt-3 max-w-2xl mx-auto space-x-2 text-sm text-gray-600 font-medium">
                                     <span>Min</span>
-                                    <div class="w-32 h-4 rounded-md"
+                                    <div class="w-32 h-4 rounded-full border border-gray-200"
                                         style="background: linear-gradient(to right, rgb(0, 0, 255), rgb(0, 255, 255), rgb(0, 255, 0), rgb(255, 255, 0), rgb(255, 0, 0));">
                                     </div>
                                     <span>Max (<span id="heatmap-max-value-wide">0</span>)</span>
                                 </div>
-                                <div class="text-center mt-4 flex justify-center items-center space-x-2">
+                                <div class="text-center mt-6 flex justify-center items-center space-x-3">
                                     <button
-                                        class="download-btn-wide bg-slate-600 hover:bg-slate-700 text-white text-sm h-9 px-4 flex items-center justify-center rounded-md"
+                                        class="download-btn-wide bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-sm h-10 px-5 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                         data-target="heatmap-canvas-wide" data-format="png">PNGで保存</button>
                                     <button
-                                        class="download-btn-wide bg-slate-600 hover:bg-slate-700 text-white text-sm h-9 px-4 flex items-center justify-center rounded-md"
+                                        class="download-btn-wide bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-sm h-10 px-5 flex items-center justify-center rounded-full transition-colors mac-shadow"
                                         data-target="heatmap-canvas-wide" data-format="pdf">PDFで保存</button>
                                 </div>
                             </div>
 
                             <div id="trajectory-3d-view-wide" class="hidden">
                                 <div id="trajectory-3d-container-wide"
-                                    class="w-full max-w-2xl mx-auto aspect-square relative bg-slate-50 border rounded-lg shadow-sm">
+                                    class="w-full max-w-2xl mx-auto aspect-square relative bg-gray-50 border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
                                 </div>
                             </div>
-                            <p id="coordinate-unit-note" class="text-xs text-slate-500 mt-4 text-center">※
+                            <p id="coordinate-unit-note" class="text-xs text-gray-400 mt-6 text-center">※
                                 座標は正規化せず、元データの値をメートル単位に変換して使用しています。</p>
 
-                            <div id="coverage-section-wide" class="mt-8 pt-6 border-t">
-                                <h3 class="text-lg font-semibold text-center mb-4 text-slate-800">網羅率の計算</h3>
+                            <div id="coverage-section-wide" class="mt-8 pt-8 border-t border-gray-200/60">
+                                <h3 class="text-lg font-semibold text-center mb-6 text-gray-800">網羅率の計算</h3>
                                 <div
-                                    class="max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-slate-50 border rounded-lg">
+                                    class="max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-gray-50/50 border border-gray-100 rounded-2xl">
                                     <div class="space-y-4">
                                         <div>
-                                            <label class="block text-sm font-medium text-slate-700">基準範囲の形状</label>
+                                            <label class="block text-[13px] font-medium text-gray-700">基準範囲の形状</label>
                                             <div class="mt-2 flex gap-4"><label class="flex items-center"><input
                                                         type="radio" name="area-shape-wide" value="circle"
-                                                        class="form-radio" checked> <span
-                                                        class="ml-2">円</span></label><label
+                                                        class="form-radio text-blue-500 focus:ring-blue-500 focus:ring-offset-0" checked> <span
+                                                        class="ml-2 text-sm text-gray-600">円</span></label><label
                                                     class="flex items-center"><input type="radio" name="area-shape-wide"
-                                                        value="square" class="form-radio"> <span
-                                                        class="ml-2">正方形</span></label></div>
+                                                        value="square" class="form-radio text-blue-500 focus:ring-blue-500 focus:ring-offset-0"> <span
+                                                        class="ml-2 text-sm text-gray-600">正方形</span></label></div>
                                         </div>
                                         <div>
                                             <label for="area-size-wide"
-                                                class="block text-sm font-medium text-slate-700"><span
+                                                class="block text-[13px] font-medium text-gray-700"><span
                                                     id="area-size-label-wide">半径</span> (<span
                                                     class="unit-label">mm</span>)</label>
                                             <input type="number" id="area-size-wide" value="2000" step="100"
-                                                class="mt-1 block w-full rounded-md shadow-sm p-2 text-sm border-slate-300">
+                                                class="mt-1 block w-full rounded-lg shadow-sm p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                         </div>
                                         <div>
-                                            <label class="block text-sm font-medium text-slate-700">中心座標</label>
+                                            <label class="block text-[13px] font-medium text-gray-700">中心座標</label>
                                             <div class="mt-2 flex gap-4"><label class="flex items-center"><input
                                                         type="radio" name="center-type-wide" value="data"
-                                                        class="form-radio" checked> <span
-                                                        class="ml-2">データの中心</span></label><label
+                                                        class="form-radio text-blue-500 focus:ring-blue-500 focus:ring-offset-0" checked> <span
+                                                        class="ml-2 text-sm text-gray-600">データの中心</span></label><label
                                                     class="flex items-center"><input type="radio"
-                                                        name="center-type-wide" value="custom" class="form-radio"> <span
-                                                        class="ml-2">座標指定</span></label></div>
+                                                        name="center-type-wide" value="custom" class="form-radio text-blue-500 focus:ring-blue-500 focus:ring-offset-0"> <span
+                                                        class="ml-2 text-sm text-gray-600">座標指定</span></label></div>
                                         </div>
                                         <div id="custom-center-inputs-wide" class="hidden space-y-2">
                                             <div class="flex items-center gap-2"><label for="center-x-wide"
-                                                    class="text-sm" id="center-x-label-wide">X:</label><input
+                                                    class="text-sm text-gray-500" id="center-x-label-wide">X:</label><input
                                                     type="number" id="center-x-wide" value="0" step="0.1"
-                                                    class="block w-full rounded-md shadow-sm p-2 text-sm border-slate-300"><label
-                                                    for="center-y-wide" class="text-sm"
+                                                    class="block w-full rounded-lg shadow-sm p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow"><label
+                                                    for="center-y-wide" class="text-sm text-gray-500"
                                                     id="center-y-label-wide">Y:</label><input type="number"
                                                     id="center-y-wide" value="0" step="0.1"
-                                                    class="block w-full rounded-md shadow-sm p-2 text-sm border-slate-300">
+                                                    class="block w-full rounded-lg shadow-sm p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                             </div>
                                         </div>
                                     </div>
                                     <div
-                                        class="flex flex-col items-center justify-center bg-white p-4 rounded-md border">
+                                        class="flex flex-col items-center justify-center bg-white p-6 rounded-xl border border-gray-100 mac-shadow">
                                         <button id="calculate-coverage-btn-wide"
-                                            class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-6 rounded-md shadow-sm">計算実行</button>
-                                        <div class="mt-4 text-center">
-                                            <p class="text-sm text-slate-600">網羅率</p>
-                                            <p class="text-3xl font-bold text-slate-800 my-1"><span
-                                                    id="coverage-result-wide">--</span> %</p>
+                                            class="w-full btn-gradient-primary text-white font-medium py-2.5 px-6 rounded-full mac-shadow transition-transform active:scale-95">計算実行</button>
+                                        <div class="mt-6 text-center">
+                                            <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">網羅率</p>
+                                            <p class="text-4xl font-bold text-gray-900 my-1 tracking-tight"><span
+                                                    id="coverage-result-wide">--</span> <span class="text-xl text-gray-400 font-medium">%</span></p>
                                         </div>
                                     </div>
                                 </div>
@@ -1114,62 +1165,62 @@
                 <div class="page" id="standard-velocity">
                     <div class="max-w-3xl mx-auto space-y-8">
                         <header class="text-center">
-                            <h1 class="text-3xl font-bold text-slate-800">基準速度算出ツール</h1>
-                            <p class="text-slate-500 mt-2">モーションキャプチャのCSVデータから車輪の基準速度を計算します。</p>
+                            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">基準速度算出ツール</h1>
+                            <p class="text-gray-500 mt-2 font-medium">モーションキャプチャのCSVデータから車輪の基準速度を計算します。</p>
                         </header>
 
-                        <section id="step-1-file-upload-std" class="bg-white p-6 rounded-lg shadow-sm border">
-                            <h2 class="text-xl font-semibold text-center mb-6">1. データ入力</h2>
+                        <section id="step-1-file-upload-std" class="mac-card p-8">
+                            <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">1. データ入力</h2>
                             <div class="mt-4 flex flex-col items-center gap-3">
                                 <label for="csv-file-input-std"
-                                    class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2 px-5 border border-slate-300 rounded-md shadow-sm transition-colors">
+                                    class="cursor-pointer btn-gradient-primary text-white font-medium py-2 px-6 rounded-full mac-shadow transition-transform active:scale-95 text-sm">
                                     ファイルを選択
                                 </label>
                                 <input type="file" id="csv-file-input-std" class="hidden" accept=".csv">
-                                <p id="file-name-display-std" class="text-sm text-slate-500 mt-2">ファイルが選択されていません</p>
+                                <p id="file-name-display-std" class="text-sm text-gray-500 mt-2">ファイルが選択されていません</p>
                             </div>
                         </section>
 
                         <div id="loading-indicator-std" class="hidden flex-col items-center justify-center py-10">
                             <div class="loader"></div>
-                            <p class="text-slate-600 mt-4">ファイルを解析中...</p>
+                            <p class="text-gray-500 mt-4 font-medium">ファイルを解析中...</p>
                         </div>
 
-                        <section id="step-2-parameters-std" class="hidden bg-white p-6 rounded-lg shadow-sm border">
-                            <h2 class="text-xl font-semibold text-center mb-6">2. パラメータ設定</h2>
-                            <div class="mt-4 space-y-5 max-w-sm mx-auto">
+                        <section id="step-2-parameters-std" class="hidden mac-card p-8">
+                            <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">2. パラメータ設定</h2>
+                            <div class="mt-4 space-y-6 max-w-sm mx-auto">
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700">① 回転データの形式</label>
+                                    <label class="block text-sm font-medium text-gray-700">① 回転データの形式</label>
                                     <div class="flex items-center space-x-4 mt-2">
                                         <label class="flex items-center">
                                             <input type="radio" name="rotation-format-std" value="euler"
-                                                class="form-radio text-blue-600 focus:ring-blue-500" checked>
-                                            <span class="ml-2 text-sm text-slate-700">オイラー角 (度数法)</span>
+                                                class="form-radio text-blue-500 focus:ring-blue-500 focus:ring-offset-0" checked>
+                                            <span class="ml-2 text-sm text-gray-700">オイラー角 (度数法)</span>
                                         </label>
                                         <label class="flex items-center">
                                             <input type="radio" name="rotation-format-std" value="quaternion"
-                                                class="form-radio text-blue-600 focus:ring-blue-500">
-                                            <span class="ml-2 text-sm text-slate-700">クウォータニオン</span>
+                                                class="form-radio text-blue-500 focus:ring-blue-500 focus:ring-offset-0">
+                                            <span class="ml-2 text-sm text-gray-700">クウォータニオン</span>
                                         </label>
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700">② 車輪の剛体を選択</label>
+                                    <label class="block text-sm font-medium text-gray-700">② 車輪の剛体を選択</label>
                                     <div id="rigidbody-radio-container-std"
-                                        class="mt-2 space-y-2 max-h-40 overflow-y-auto border p-3 rounded-md bg-slate-50/70">
+                                        class="mt-2 space-y-2 max-h-40 overflow-y-auto border border-gray-100 p-3 rounded-xl bg-gray-50/50">
                                     </div>
                                 </div>
                                 <div>
-                                    <label for="radius-input-std" class="block text-sm font-medium text-slate-700">③
+                                    <label for="radius-input-std" class="block text-sm font-medium text-gray-700">③
                                         車輪の半径 (cm)</label>
                                     <input type="number" id="radius-input-std" value="10" step="1"
-                                        class="mt-1 block w-full border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm">
+                                        class="mt-1 block w-full modern-input rounded-xl py-2 px-3 focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow text-sm">
                                 </div>
                                 <div>
-                                    <label for="axis-select-std" class="block text-sm font-medium text-slate-700">④
+                                    <label for="axis-select-std" class="block text-sm font-medium text-gray-700">④
                                         車輪の回転軸</label>
                                     <select id="axis-select-std"
-                                        class="mt-1 block w-full bg-white border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm">
+                                        class="mt-1 block w-full bg-white modern-input rounded-xl py-2 px-3 focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow text-sm">
                                         <option value="X">X軸</option>
                                         <option value="Y" selected>Y軸</option>
                                         <option value="Z">Z軸</option>
@@ -1178,28 +1229,28 @@
                             </div>
                             <div class="text-center mt-8">
                                 <button id="calculate-btn-std"
-                                    class="w-full max-w-sm bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-6 rounded-md shadow-sm transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                    class="w-full max-w-sm btn-gradient-primary text-white font-medium py-3.5 px-6 rounded-xl transition-all active:scale-95">
                                     計算開始
                                 </button>
                             </div>
                         </section>
 
-                        <section id="step-3-results-std" class="hidden bg-white p-6 rounded-lg shadow-sm border">
-                            <h2 class="text-xl font-semibold text-center mb-6">3. 計算結果</h2>
+                        <section id="step-3-results-std" class="hidden mac-card p-8">
+                            <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">3. 計算結果</h2>
                             <div id="result-display-std"
-                                class="hidden mt-6 p-6 bg-slate-50/70 rounded-lg text-center border">
-                                <p class="text-sm text-slate-600">算出された基準速度 (v)</p>
-                                <p class="text-4xl font-bold text-slate-800 my-2 tracking-tight">
-                                    <span id="result-value-std">0.00000000</span> m/s
+                                class="hidden mt-6 p-8 bg-gray-50/50 rounded-2xl text-center border border-gray-100">
+                                <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">算出された基準速度 (v)</p>
+                                <p class="text-4xl font-bold text-gray-900 my-2 tracking-tight">
+                                    <span id="result-value-std">0.00000000</span> <span class="text-xl text-gray-400 font-medium">m/s</span>
                                 </p>
                                 <button id="copy-btn-std"
-                                    class="mt-4 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-1.5 px-4 rounded-md text-sm transition-colors"
+                                    class="mt-6 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 font-medium py-2 px-6 rounded-full text-sm transition-colors mac-shadow"
                                     data-copy-value="">
                                     結果をコピー
                                 </button>
                             </div>
                             <div id="error-display-std"
-                                class="hidden mt-6 p-4 bg-red-50 text-red-800 border-l-4 border-red-400 rounded-md">
+                                class="hidden mt-6 p-4 bg-red-50 text-red-800 border border-red-200 rounded-xl text-sm">
                             </div>
                         </section>
                     </div>
@@ -1208,72 +1259,72 @@
                 <div class="page" id="distance-measurement">
                     <div class="max-w-7xl mx-auto space-y-8">
                         <header class="text-center">
-                            <h1 class="text-3xl font-bold text-slate-800">距離測定ツール</h1>
-                            <p class="text-slate-500 mt-2">マーカー間または剛体間の平均位置からの距離を測定します。</p>
+                            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">距離測定ツール</h1>
+                            <p class="text-gray-500 mt-2 font-medium">マーカー間または剛体間の平均位置からの距離を測定します。</p>
                         </header>
 
-                        <section class="bg-white p-6 rounded-lg shadow-sm border">
-                            <h2 class="text-xl font-semibold text-center mb-6">1. 設定</h2>
+                        <section class="mac-card p-8">
+                            <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">1. 設定</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-2">① CSVファイルを追加</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">① CSVファイルを追加</label>
                                     <div class="flex items-center space-x-2">
                                         <input type="file" id="csv-files-distance" accept=".csv" class="hidden">
                                         <label for="csv-files-distance"
-                                            class="w-full cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-md text-sm text-center">ファイルを選択</label>
+                                            class="w-full cursor-pointer btn-gradient-primary text-white font-medium py-2 px-4 rounded-full text-sm text-center mac-shadow transition-transform active:scale-95">ファイルを選択</label>
                                     </div>
-                                    <div id="file-name-distance" class="mt-2 text-sm text-slate-600"></div>
+                                    <div id="file-name-distance" class="mt-2 text-sm text-gray-500"></div>
                                 </div>
                                 <div class="space-y-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-2">② 解析タイプ</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">② 解析タイプ</label>
                                         <div class="flex items-center space-x-4 mt-2">
                                             <label class="flex items-center"><input type="radio"
-                                                    name="analysis-type-distance" value="marker" class="form-radio"
-                                                    checked> <span class="ml-2 text-sm">マーカー間距離</span></label>
+                                                    name="analysis-type-distance" value="marker" class="form-radio text-blue-500 focus:ring-blue-500 focus:ring-offset-0"
+                                                    checked> <span class="ml-2 text-sm text-gray-700">マーカー間距離</span></label>
                                             <label class="flex items-center"><input type="radio"
-                                                    name="analysis-type-distance" value="rigidbody" class="form-radio">
-                                                <span class="ml-2 text-sm">剛体間距離</span></label>
+                                                    name="analysis-type-distance" value="rigidbody" class="form-radio text-blue-500 focus:ring-blue-500 focus:ring-offset-0">
+                                                <span class="ml-2 text-sm text-gray-700">剛体間距離</span></label>
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-2">③ データ取得間隔</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">③ データ取得間隔</label>
                                         <div class="flex items-center mb-2">
                                             <input type="checkbox" id="enable-downsampling-distance"
-                                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                class="h-4 w-4 text-blue-500 focus:ring-blue-500 border-gray-300 rounded focus:ring-offset-0">
                                             <label for="enable-downsampling-distance"
-                                                class="ml-2 text-sm text-slate-700">ダウンサンプリングを行う</label>
+                                                class="ml-2 text-sm text-gray-700">ダウンサンプリングを行う</label>
                                         </div>
                                         <div id="sampling-rate-container-distance" class="hidden">
                                             <label for="sampling-rate-distance"
-                                                class="block text-xs font-medium text-slate-500 mb-1">間隔 (秒)</label>
+                                                class="block text-[11px] font-medium text-gray-500 mb-1">間隔 (秒)</label>
                                             <input type="number" id="sampling-rate-distance" value="0.1" step="0.01"
                                                 min="0.01"
-                                                class="block w-full rounded-md shadow-sm p-2 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                                class="block w-full rounded-lg shadow-sm p-2 text-sm modern-input focus:ring-2 focus:ring-blue-500/50 outline-none transition-shadow">
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-2">④ 元データの単位</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">④ 元データの単位</label>
                                         <div class="flex items-center space-x-4 mt-2">
                                             <label class="flex items-center"><input type="radio"
-                                                    name="data-unit-distance" value="mm" class="form-radio" checked>
-                                                <span class="ml-2 text-sm">mm</span></label>
+                                                    name="data-unit-distance" value="mm" class="form-radio text-blue-500 focus:ring-blue-500 focus:ring-offset-0" checked>
+                                                <span class="ml-2 text-sm text-gray-700">mm</span></label>
                                             <label class="flex items-center"><input type="radio"
-                                                    name="data-unit-distance" value="m" class="form-radio"> <span
-                                                    class="ml-2 text-sm">m</span></label>
+                                                    name="data-unit-distance" value="m" class="form-radio text-blue-500 focus:ring-blue-500 focus:ring-offset-0"> <span
+                                                    class="ml-2 text-sm text-gray-700">m</span></label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div id="pair-selection-area" class="mt-8 hidden">
-                                <h3 class="text-lg font-medium text-slate-800 mb-4 border-b pb-2">⑤ 測定対象のペアを選択 (最大5件)
+                                <h3 class="text-base font-semibold text-gray-800 mb-4 border-b border-gray-100 pb-2">⑤ 測定対象のペアを選択 (最大5件)
                                 </h3>
                                 <div id="pair-list-container" class="space-y-4">
                                     <!-- Dynamic Rows -->
                                 </div>
                                 <button id="add-pair-btn"
-                                    class="mt-4 text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                                    class="mt-4 text-sm text-blue-500 hover:text-blue-600 font-medium flex items-center transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20"
                                         fill="currentColor">
                                         <path fill-rule="evenodd"
@@ -1286,34 +1337,34 @@
 
                             <div class="text-center mt-8">
                                 <button id="analyze-btn-distance"
-                                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-8 rounded-md shadow-sm disabled:bg-slate-400"
+                                    class="btn-gradient-primary text-white font-medium py-3 px-10 rounded-full transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                                     disabled>
                                     解析開始
                                 </button>
                             </div>
                         </section>
 
-                        <section id="results-card-distance" class="bg-white p-6 rounded-lg shadow-sm border hidden">
-                            <h2 class="text-xl font-semibold text-center mb-6">2. 解析結果</h2>
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-slate-200">
-                                    <thead class="bg-slate-50">
+                        <section id="results-card-distance" class="mac-card p-8 hidden">
+                            <h2 class="text-lg font-semibold text-center mb-6 text-gray-800">2. 解析結果</h2>
+                            <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
                                         <tr>
                                             <th scope="col"
-                                                class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                                class="px-6 py-4 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
                                                 ペア</th>
                                             <th scope="col"
-                                                class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                                class="px-6 py-4 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
                                                 距離 (m)</th>
                                             <th scope="col"
-                                                class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                                class="px-6 py-4 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
                                                 点A 平均座標 (x,y,z)</th>
                                             <th scope="col"
-                                                class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                                class="px-6 py-4 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
                                                 点B 平均座標 (x,y,z)</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="results-table-body-distance" class="bg-white divide-y divide-slate-200">
+                                    <tbody id="results-table-body-distance" class="bg-white divide-y divide-gray-100">
                                     </tbody>
                                 </table>
                             </div>
@@ -1322,10 +1373,10 @@
                 </div>
 
                 <div class="page" id="how-to-use">
-                    <h1 class="text-2xl font-semibold text-gray-800 mb-8 text-center">使い方ガイド</h1>
+                    <h1 class="text-2xl font-semibold text-gray-900 mb-8 text-center tracking-tight">使い方ガイド</h1>
 
                     <div class="space-y-10">
-                        <div class="bg-white/70 backdrop-blur-xl rounded-xl border border-gray-200/80 shadow-sm">
+                        <div class="mac-card">
                             <div class="p-6 sm:p-8">
                                 <h2 class="text-xl font-semibold text-gray-900 flex items-center gap-3 mb-6">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -1384,7 +1435,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-white/70 backdrop-blur-xl rounded-xl border border-gray-200/80 shadow-sm">
+                        <div class="mac-card">
                             <div class="p-6 sm:p-8">
                                 <h2 class="text-xl font-semibold text-gray-900 flex items-center gap-3 mb-6">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -1510,7 +1561,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-white/70 backdrop-blur-xl rounded-xl border border-gray-200/80 shadow-sm">
+                        <div class="mac-card">
                             <div class="p-6 sm:p-8">
                                 <h2 class="text-xl font-semibold text-gray-900 flex items-center gap-3 mb-6">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -1589,8 +1640,8 @@
 
                 <div class="page" id="algorithms">
                     <div class="max-w-4xl mx-auto space-y-8">
-                        <div class="bg-white p-8 rounded-lg shadow-sm border">
-                            <h1 class="text-2xl font-bold text-slate-800 mb-6 border-b pb-3">アルゴリズム仕様</h1>
+                        <div class="mac-card p-8">
+                            <h1 class="text-2xl font-bold text-gray-900 tracking-tight mb-6 border-b border-gray-100 pb-4">アルゴリズム仕様</h1>
                             <div class="prose-styles">
                                 <p>本ツールで採用されているデータ解析のアルゴリズムおよび計算式について、その詳細を以下に示します。</p>
 
