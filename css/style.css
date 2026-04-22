@@ -1,0 +1,300 @@
+/* css/style.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+
+:root {
+    --bg-light: #f1f5f9;
+    --text-light: #334155;
+    --bg-dark: #0f172a;
+    --text-dark: #f8fafc;
+    --primary: #3b82f6;
+    --transition-duration: 0s;
+}
+
+
+
+body {
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    transition: background-color var(--transition-duration) ease, color var(--transition-duration) ease;
+    overflow-x: hidden;
+}
+
+/* Theater Mode (Dark Theme activated when Viewer is open) */
+body.theater-mode {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+}
+
+/* Base Page Visibility */
+.page {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.page.active {
+    display: block;
+    opacity: 1;
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Sidebar and Navigation (Liquid Glass Base) */
+.glass-sidebar {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 1px 0 20px rgba(0, 0, 0, 0.05);
+    transition: background 0.5s ease, border-color 0.5s ease;
+    z-index: 100;
+}
+
+body.theater-mode .glass-sidebar {
+    background: rgba(15, 23, 42, 0.3);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 1px 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.nav-link {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body:not(.theater-mode) .nav-link.active {
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+body.theater-mode .nav-link {
+    color: #94a3b8;
+}
+
+body.theater-mode .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
+}
+
+body.theater-mode .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1);
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Mobile Menu */
+#mobile-menu-overlay { transition: opacity 0.3s ease-in-out; }
+#mobile-menu-content { transition: transform 0.3s ease-in-out; }
+body.mobile-menu-open { overflow: hidden; }
+
+/* Loaders */
+.loader, .download-loader {
+    border: 4px solid rgba(229, 231, 235, 0.5);
+    border-radius: 50%;
+    border-top: 4px solid var(--primary);
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+body.theater-mode .loader {
+    border: 4px solid rgba(51, 65, 85, 0.5);
+    border-top: 4px solid #60a5fa;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* macOS like scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px;}
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+    background-color: rgba(148, 163, 184, 0.5);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(148, 163, 184, 0.8);
+}
+body.theater-mode ::-webkit-scrollbar-thumb {
+    background-color: rgba(71, 85, 105, 0.6);
+}
+
+/* Chart Container */
+.chart-container { position: relative; width: 100%; height: 100%; }
+#redraw-charts-btn:active { transform: scale(0.95); transition: transform 0.1s ease-in-out; }
+.tab-btn.active { background-color: var(--primary); color: white; }
+
+/* Dashboard Cards (Liquid Glass Theme) */
+.glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border-radius: 1rem;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
+.glass-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.9), 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+body.theater-mode .data-card {
+    /* If viewer mode somehow shows them, they stay white but maybe dimmed?
+       Actually, standard tools are hidden when Viewer is active, but if not, keep them visible. */
+}
+
+/* 3D Viewer Container Styles */
+#playback-viewer {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    overflow: hidden;
+    z-index: 0; 
+}
+
+body.theater-mode main {
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+#mocap-viewer.active {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+#three-canvas { display: block; width: 100%; height: 100%; }
+
+
+/* Liquid Glass Slider Tweaks */
+input[type=range].mocap-slider {
+    -webkit-appearance: none;
+    background: transparent;
+    width: 100%;
+    height: 32px;
+    cursor: pointer;
+}
+input[type=range].mocap-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 16px; width: 16px;
+    border-radius: 50%;
+    background: #60a5fa;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.4);
+    cursor: pointer;
+    margin-top: -6px;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s;
+}
+input[type=range].mocap-slider::-webkit-slider-thumb:hover { 
+    transform: scale(1.3);
+    background: #93c5fd;
+}
+input[type=range].mocap-slider::-webkit-slider-runnable-track {
+    width: 100%; height: 2px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 1px;
+}
+body.theater-mode input[type=range].mocap-slider::-webkit-slider-runnable-track {
+    background: rgba(255, 255, 255, 0.15);
+}
+input[type=range].mocap-slider:focus { outline: none; }
+
+
+/* UI Layer for 3D Viewer */
+.viewer-ui-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+}
+.pointer-events-auto { pointer-events: auto; }
+
+
+
+/* Prose for text contents */
+.prose-styles h3 { font-size: 1.125rem; font-weight: 600; margin-top: 1.5em; margin-bottom: 0.5em; padding-bottom: 0.25em; border-bottom: 1px solid #e2e8f0; }
+.prose-styles h4 { font-size: 1.05rem; font-weight: 600; margin-top: 1.5em; margin-bottom: 0.5em; }
+.prose-styles p { font-size: 0.95rem; line-height: 1.6; margin-bottom: 1em; }
+.prose-styles .formula-block { background-color: #f8fafc; padding: 1rem; border-radius: 0.5rem; margin: 1.5rem 0; overflow-x: auto; text-align: center; }
+
+/* Mocap Viewer specific overlay styles */
+.viewer-panel {
+    background: rgba(15, 23, 42, 0.85); /* slate-900 */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(71, 85, 105, 0.5); /* slate-600 */
+    color: #e2e8f0;
+}
+
+/* Mobile Header Theater Mode */
+body.theater-mode header.lg\:hidden {
+    background-color: rgba(15, 23, 42, 0.7) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+body.theater-mode #mobile-title, body.theater-mode #mobile-menu-btn svg {
+    color: #f1f5f9;
+}
+
+
+/* Theater Mode Text Overrides */
+body.theater-mode #mobile-title, 
+body.theater-mode .glass-sidebar h1 {
+    color: #f1f5f9 !important;
+}
+
+/* Glass Button Theme for Viewer UI */
+.glass-btn {
+    background: rgba(59, 130, 246, 0.4);
+    backdrop-filter: blur(10px) saturate(150%);
+    -webkit-backdrop-filter: blur(10px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.3), 0 4px 6px rgba(0,0,0,0.1);
+}
+.glass-btn:hover {
+    background: rgba(59, 130, 246, 0.6);
+}
+
+
+#main-content-area {
+    overflow-y: scroll !important;
+    scrollbar-gutter: stable;
+}
+
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  25% { transform: translate(25vw, -15vh) scale(1.3); }
+  50% { transform: translate(-15vw, 15vh) scale(0.8); }
+  75% { transform: translate(10vw, 20vh) scale(1.2); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+.animate-blob {
+  animation: blob 12s infinite ease-in-out;
+}
+.animation-delay-2000 {
+  animation-delay: 3s;
+}
+.animation-delay-4000 {
+  animation-delay: 6s;
+}
+
+body.theater-mode header.lg\:hidden {
+    background-color: rgba(15, 23, 42, 0.85) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+body.theater-mode #mobile-title, body.theater-mode #mobile-menu-btn {
+    color: #f1f5f9 !important;
+}
+
+.animation-delay-6000 { animation-delay: 9s; }

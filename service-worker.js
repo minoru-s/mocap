@@ -1,5 +1,5 @@
 // キャッシュ名をユニークにするためにバージョンを付けます。ファイルを更新した際には、このバージョン番号を上げてください。
-const CACHE_NAME = 'mp-pwa-cache-20260314'; 
+const CACHE_NAME = 'mp-pwa-cache-20260422';
 const urlsToCache = [
   './',
   './index.html',
@@ -42,8 +42,8 @@ self.addEventListener('activate', event => {
         })
       );
     }).then(() => {
-        // ページをすぐに制御下に置く
-        return self.clients.claim();
+      // ページをすぐに制御下に置く
+      return self.clients.claim();
     })
   );
 });
