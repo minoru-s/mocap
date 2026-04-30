@@ -66,6 +66,9 @@
                     }
                 });
                 window.scrollTo(0, 0);
+                if (mainContentArea) {
+                    mainContentArea.scrollTop = 0;
+                }
 
                 if (pageId === 'algorithms') {
                     renderMath();

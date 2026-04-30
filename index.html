@@ -1181,36 +1181,42 @@
 
                 <div class="page" id="how-to-use">
                     <h1 class="text-2xl font-semibold text-gray-800 mb-8 text-center">使い方ガイド</h1>
-
-                    <div class="space-y-10">
+                    <div class="max-w-4xl mx-auto space-y-10">
                         <div class="bg-white/70 backdrop-blur-xl rounded-xl border border-gray-200/80 shadow-sm">
                             <div class="p-6 sm:p-8">
                                 <h2 class="text-xl font-semibold text-gray-900 flex items-center gap-3 mb-6">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="2" stroke="currentColor" class="h-6 w-6 text-gray-500">
+                                    <svg class="h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7">
-                                        </path>
+                                            d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2-1m2 1l-2 1m2-1v10.5M4 7l2-1M4 7l2 1M4 7v10.5M12 3l2 1m-2-1l-2 1M12 21l2-1m-2 1l-2-1M20 17.5l-2 1M4 17.5l2 1" />
                                     </svg>
-                                    <span>広域解析ツール</span>
+                                    <span>3Dモーションビューア</span>
                                 </h2>
+
+                                <div
+                                    class="mb-6 p-3 bg-blue-50/80 rounded-md border border-blue-100 flex items-start gap-3">
+                                    <svg class="w-5 h-5 text-blue-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <div>
+                                        <p class="font-medium text-blue-800 text-sm">Tip: 大容量ファイルのプレビューに最適</p>
+                                        <p class="text-xs text-blue-700/90 mt-1">
+                                            このツールはブラウザ上で高速に大容量データを読み込んで描画する技術を用いています。Motive等で出力したサイズの大きいデータについて、正しくトラッキングできているか等の結果を素早く確認したい場合に非常に便利です。
+                                        </p>
+                                    </div>
+                                </div>
+
                                 <div class="space-y-6">
                                     <div class="flex items-start gap-4">
                                         <div
                                             class="flex-shrink-0 bg-gray-200 text-gray-600 rounded-full h-7 w-7 text-sm flex items-center justify-center font-medium mt-1">
                                             1</div>
                                         <div>
-                                            <h3 class="text-base font-medium text-gray-800 mb-3">設定</h3>
-                                            <div class="space-y-3 text-gray-600 text-sm">
-                                                <p><strong>① CSVファイルを追加:</strong> 解析したいMotiveのCSVファイルを1つ以上選択します。</p>
-                                                <p><strong>② データ取得間隔:</strong>
-                                                    データをサンプリングする時間間隔を秒単位で指定します。短いほど軌跡は詳細になりますが、処理が重くなる場合があります。</p>
-                                                <p><strong>③ ヒートマップのマス目サイズ:</strong>
-                                                    滞在頻度を可視化するヒートマップの1マスの大きさをメートル単位で指定します。</p>
-                                                <p><strong>④ 方向の定義:</strong> 座標系における鉛直方向の軸を定義します。</p>
-                                                <p><strong>⑤ 解析対象の剛体を選択:</strong> ファイル内の剛体から解析したいものを選択し、必要に応じて凡例名を編集します。
-                                                </p>
-                                            </div>
+                                            <h3 class="text-base font-medium text-gray-800 mb-2">データ入力</h3>
+                                            <p class="text-gray-600 text-sm">
+                                                画面へのドラッグ＆ドロップ、またはファイル選択ダイアログからMotiveのCSVファイルを読み込みます。</p>
                                         </div>
                                     </div>
                                     <div class="flex items-start gap-4">
@@ -1218,8 +1224,8 @@
                                             class="flex-shrink-0 bg-gray-200 text-gray-600 rounded-full h-7 w-7 text-sm flex items-center justify-center font-medium mt-1">
                                             2</div>
                                         <div>
-                                            <h3 class="text-base font-medium text-gray-800 mb-2">解析開始</h3>
-                                            <p class="text-gray-600 text-sm">ボタンを押すと解析が実行され、結果が表示されます。</p>
+                                            <h3 class="text-base font-medium text-gray-800 mb-2">表示対象の選択</h3>
+                                            <p class="text-gray-600 text-sm">右側のパネルから、3D空間に表示したい剛体（オブジェクト）を選択します。</p>
                                         </div>
                                     </div>
                                     <div class="flex items-start gap-4">
@@ -1227,14 +1233,10 @@
                                             class="flex-shrink-0 bg-gray-200 text-gray-600 rounded-full h-7 w-7 text-sm flex items-center justify-center font-medium mt-1">
                                             3</div>
                                         <div>
-                                            <h3 class="text-base font-medium text-gray-800 mb-3">結果の確認</h3>
+                                            <h3 class="text-base font-medium text-gray-800 mb-3">再生・視点操作</h3>
                                             <ul class="list-disc list-inside space-y-2 text-gray-600 text-sm">
-                                                <li><strong>軌跡タブ:</strong> 選択した剛体の平面移動軌跡をプロットします。</li>
-                                                <li><strong>ヒートマップタブ:</strong>
-                                                    各マスに剛体が滞在した時間の頻度を色で表示します。カーソルを合わせると、そのマスのカウント数が表示されます。</li>
-                                                <li><strong>網羅率の計算:</strong>
-                                                    指定した円または正方形の範囲に対し、軌跡がどれだけの面積をカバーしたかをパーセンテージで計算します。</li>
-                                                <li>各グラフはPNGまたはPDF形式でダウンロードできます。</li>
+                                                <li>画面下部のコントロールバーで、再生、一時停止、シーク操作が可能です。</li>
+                                                <li>マウスの左ドラッグで視点の回転、右ドラッグで平行移動、ホイールでズームイン・アウトができます。</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -1371,6 +1373,117 @@
                         <div class="bg-white/70 backdrop-blur-xl rounded-xl border border-gray-200/80 shadow-sm">
                             <div class="p-6 sm:p-8">
                                 <h2 class="text-xl font-semibold text-gray-900 flex items-center gap-3 mb-6">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" class="h-6 w-6 text-gray-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7">
+                                        </path>
+                                    </svg>
+                                    <span>広域解析ツール</span>
+                                </h2>
+                                <div class="space-y-6">
+                                    <div class="flex items-start gap-4">
+                                        <div
+                                            class="flex-shrink-0 bg-gray-200 text-gray-600 rounded-full h-7 w-7 text-sm flex items-center justify-center font-medium mt-1">
+                                            1</div>
+                                        <div>
+                                            <h3 class="text-base font-medium text-gray-800 mb-3">設定</h3>
+                                            <div class="space-y-3 text-gray-600 text-sm">
+                                                <p><strong>① CSVファイルを追加:</strong> 解析したいMotiveのCSVファイルを1つ以上選択します。</p>
+                                                <p><strong>② データ取得間隔:</strong>
+                                                    データをサンプリングする時間間隔を秒単位で指定します。短いほど軌跡は詳細になりますが、処理が重くなる場合があります。</p>
+                                                <p><strong>③ ヒートマップのマス目サイズ:</strong>
+                                                    滞在頻度を可視化するヒートマップの1マスの大きさをメートル単位で指定します。</p>
+                                                <p><strong>④ 方向の定義:</strong> 座標系における鉛直方向の軸を定義します。</p>
+                                                <p><strong>⑤ 解析対象の剛体を選択:</strong> ファイル内の剛体から解析したいものを選択し、必要に応じて凡例名を編集します。
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4">
+                                        <div
+                                            class="flex-shrink-0 bg-gray-200 text-gray-600 rounded-full h-7 w-7 text-sm flex items-center justify-center font-medium mt-1">
+                                            2</div>
+                                        <div>
+                                            <h3 class="text-base font-medium text-gray-800 mb-2">解析開始</h3>
+                                            <p class="text-gray-600 text-sm">ボタンを押すと解析が実行され、結果が表示されます。</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4">
+                                        <div
+                                            class="flex-shrink-0 bg-gray-200 text-gray-600 rounded-full h-7 w-7 text-sm flex items-center justify-center font-medium mt-1">
+                                            3</div>
+                                        <div>
+                                            <h3 class="text-base font-medium text-gray-800 mb-3">結果の確認</h3>
+                                            <ul class="list-disc list-inside space-y-2 text-gray-600 text-sm">
+                                                <li><strong>軌跡タブ:</strong> 選択した剛体の平面移動軌跡をプロットします。</li>
+                                                <li><strong>ヒートマップタブ:</strong>
+                                                    各マスに剛体が滞在した時間の頻度を色で表示します。カーソルを合わせると、そのマスのカウント数が表示されます。</li>
+                                                <li><strong>網羅率の計算:</strong>
+                                                    指定した円または正方形の範囲に対し、軌跡がどれだけの面積をカバーしたかをパーセンテージで計算します。</li>
+                                                <li>各グラフはPNGまたはPDF形式でダウンロードできます。</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/70 backdrop-blur-xl rounded-xl border border-gray-200/80 shadow-sm">
+                            <div class="p-6 sm:p-8">
+                                <h2 class="text-xl font-semibold text-gray-900 flex items-center gap-3 mb-6">
+                                    <svg class="h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="8" width="18" height="8" rx="1" stroke-linecap="round"
+                                            stroke-linejoin="round" />
+                                        <line x1="6" y1="12" x2="6" y2="15" stroke-linecap="round" />
+                                        <line x1="12" y1="12" x2="12" y2="15" stroke-linecap="round" />
+                                        <line x1="18" y1="12" x2="18" y2="15" stroke-linecap="round" />
+                                        <line x1="9" y1="13" x2="9" y2="15" stroke-linecap="round" />
+                                        <line x1="15" y1="13" x2="15" y2="15" stroke-linecap="round" />
+                                    </svg>
+                                    <span>距離測定ツール</span>
+                                </h2>
+                                <div class="space-y-6">
+                                    <div class="flex items-start gap-4">
+                                        <div
+                                            class="flex-shrink-0 bg-gray-200 text-gray-600 rounded-full h-7 w-7 text-sm flex items-center justify-center font-medium mt-1">
+                                            1</div>
+                                        <div>
+                                            <h3 class="text-base font-medium text-gray-800 mb-2">データ入力と設定</h3>
+                                            <div class="space-y-3 text-gray-600 text-sm">
+                                                <p><strong>① CSVファイルを追加:</strong> 解析したいMotiveのCSVファイルを選択します。</p>
+                                                <p><strong>② 解析タイプ:</strong> マーカー間の距離か、剛体間の距離かを指定します。</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4">
+                                        <div
+                                            class="flex-shrink-0 bg-gray-200 text-gray-600 rounded-full h-7 w-7 text-sm flex items-center justify-center font-medium mt-1">
+                                            2</div>
+                                        <div>
+                                            <h3 class="text-base font-medium text-gray-800 mb-2">測定対象のペアを選択</h3>
+                                            <p class="text-gray-600 text-sm">
+                                                ファイル内に含まれるマーカーまたは剛体から、距離を測りたい2つの点（点Aと点B）のペアを作成します。最大5件まで同時に測定可能です。</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4">
+                                        <div
+                                            class="flex-shrink-0 bg-gray-200 text-gray-600 rounded-full h-7 w-7 text-sm flex items-center justify-center font-medium mt-1">
+                                            3</div>
+                                        <div>
+                                            <h3 class="text-base font-medium text-gray-800 mb-2">解析開始と結果確認</h3>
+                                            <p class="text-gray-600 text-sm">
+                                                解析を実行すると、指定した各ペア間の距離（平均距離）と、それぞれの点の平均座標が表示されます。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/70 backdrop-blur-xl rounded-xl border border-gray-200/80 shadow-sm">
+                            <div class="p-6 sm:p-8">
+                                <h2 class="text-xl font-semibold text-gray-900 flex items-center gap-3 mb-6">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round" class="text-gray-500">
@@ -1442,17 +1555,79 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="bg-white/70 backdrop-blur-xl rounded-xl border border-gray-200/80 shadow-sm">
+                            <div class="p-6 sm:p-8">
+                                <h2 class="text-xl font-semibold text-gray-900 flex items-center gap-3 mb-6">
+                                    <svg class="h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
+                                    </svg>
+                                    <span>データトリミング</span>
+                                </h2>
+                                <div class="space-y-6">
+                                    <div class="flex items-start gap-4">
+                                        <div
+                                            class="flex-shrink-0 bg-gray-200 text-gray-600 rounded-full h-7 w-7 text-sm flex items-center justify-center font-medium mt-1">
+                                            1</div>
+                                        <div>
+                                            <h3 class="text-base font-medium text-gray-800 mb-2">データ入力</h3>
+                                            <p class="text-gray-600 text-sm">トリミングしたいMotiveのCSVファイルを選択します。</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4">
+                                        <div
+                                            class="flex-shrink-0 bg-gray-200 text-gray-600 rounded-full h-7 w-7 text-sm flex items-center justify-center font-medium mt-1">
+                                            2</div>
+                                        <div>
+                                            <h3 class="text-base font-medium text-gray-800 mb-2">範囲選択</h3>
+                                            <ul class="list-disc list-inside space-y-2 text-gray-600 text-sm">
+                                                <li>表示されたグラフ上でシフトキーを押しながらドラッグし、必要な区間を選択します。</li>
+                                                <li>左側の入力欄に直接秒数を入力して、範囲を微調整することもできます。</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4">
+                                        <div
+                                            class="flex-shrink-0 bg-gray-200 text-gray-600 rounded-full h-7 w-7 text-sm flex items-center justify-center font-medium mt-1">
+                                            3</div>
+                                        <div>
+                                            <h3 class="text-base font-medium text-gray-800 mb-2">エクスポート</h3>
+                                            <p class="text-gray-600 text-sm">
+                                                「選択範囲をエクスポート」ボタンを押すと、指定した区間のみを抽出した新しいCSVファイルがダウンロードされます。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="page" id="algorithms">
-                    <div class="max-w-4xl mx-auto space-y-8">
-                        <div class="bg-white p-8 rounded-lg shadow-sm border">
-                            <h1 class="text-2xl font-bold text-slate-800 mb-6 border-b pb-3">アルゴリズム仕様</h1>
-                            <div class="prose-styles">
-                                <p>本ツールで採用されているデータ解析のアルゴリズムおよび計算式について、その詳細を以下に示します。</p>
+                    <h1 class="text-2xl font-semibold text-gray-800 mb-8 text-center">アルゴリズム仕様</h1>
+                    <div class="max-w-4xl mx-auto space-y-10">
+                        <div
+                            class="text-gray-600 text-sm bg-gray-50/80 p-4 rounded-lg border border-gray-200 text-center">
+                            本ツールで採用されているデータ解析のアルゴリズムおよび計算式について、その詳細を以下に示します。<br>
+                            <span
+                                class="text-xs text-gray-500 mt-2 block">※3Dモーションビューアやデータトリミング機能等は、特別な計算処理を行っていないため仕様の記載を省略しています。</span>
+                        </div>
 
-                                <h2 class="text-xl font-semibold text-slate-700 mt-8">データ解析ツール</h2>
+                        <div class="bg-white/70 backdrop-blur-xl rounded-xl border border-gray-200/80 shadow-sm">
+                            <div class="p-6 sm:p-8 prose-styles">
+                                <h2
+                                    class="text-xl font-semibold text-slate-700 mt-0 mb-6 border-b pb-3 flex items-center gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="text-gray-500">
+                                        <path d="M3 3v18h18" />
+                                        <path d="M18 17V9" />
+                                        <path d="M13 17V5" />
+                                        <path d="M8 17v-3" />
+                                    </svg>
+                                    データ解析ツール
+                                </h2>
 
                                 <h3>動作区間の自動検出</h3>
                                 <p>
@@ -1507,597 +1682,666 @@
                                         <div class="formula-block">
                                             $S [\%] =
                                             \begin{cases}
-                                            (1 - \frac{v}{u}) \times 100 & (u &gt; v, \text{ 加速スリップ}) \\
-                                            (1 - \frac{u}{v}) \times 100 & (u &lt; v, \text{ 制動スリップ})
-                                            \end{cases}$
-                                        </div>
-                                        <p>
-                                            グラフにプロットされるのは各時刻の瞬時速度から算出されたスリップ率であり、「平均スリップ率」は平均速度を用いて算出されます。
-                                        </p>
+                                            (1 - \frac{v}{u}) \times 100 & (u > v, \text{ 加速スリップ}) \\
+                                            (1 - \frac{u}{v}) \times 100 & (u < v, \text{ 制動スリップ}) \end{cases}$ </div>
+                                                <p>
+                                                    グラフにプロットされるのは各時刻の瞬時速度から算出されたスリップ率であり、「平均スリップ率」は平均速度を用いて算出されます。
+                                                </p>
 
-                                        <h3>分散</h3>
-                                        <p>
-                                            速度およびスリップ率のばらつきを示す指標として、標本分散 $\sigma^2$ と不偏分散 $u^2$ の2種類を算出しています。データ数
-                                            $n$、個々のデータ値 $x_i$、平均値 $\bar{x}$ を用いて、それぞれ以下の式で計算されます。
-                                        </p>
-                                        <div class="formula-block">
-                                            $\text{標本分散: } \sigma^2 = \frac{1}{n} \sum_{i=1}^{n} (x_i - \bar{x})^2$
-                                        </div>
-                                        <div class="formula-block">
-                                            $\text{不偏分散: } u^2 = \frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})^2$
-                                        </div>
+                                                <h3>分散</h3>
+                                                <p>
+                                                    速度およびスリップ率のばらつきを示す指標として、標本分散 $\sigma^2$ と不偏分散 $u^2$
+                                                    の2種類を算出しています。データ数
+                                                    $n$、個々のデータ値 $x_i$、平均値 $\bar{x}$ を用いて、それぞれ以下の式で計算されます。
+                                                </p>
+                                                <div class="formula-block">
+                                                    $\text{標本分散: } \sigma^2 = \frac{1}{n} \sum_{i=1}^{n} (x_i -
+                                                    \bar{x})^2$
+                                                </div>
+                                                <div class="formula-block">
+                                                    $\text{不偏分散: } u^2 = \frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})^2$
+                                                </div>
 
-                                        <h3>ローパスフィルタ</h3>
-                                        <p>
-                                            グラフのノイズを低減するために、複数のローパスフィルタから選択できます。
-                                        </p>
-                                        <h4>移動平均フィルタ</h4>
-                                        <p>
-                                            単純移動平均（Simple Moving Average）法です。指定された「サンプル数」$W$に基づき、ある点 $i$ の値 $y_i$ を、その前後
-                                            $\lfloor W/2 \rfloor$ 個のデータを含む合計 $W$ 個のデータの平均値 $\hat{y}_i$ で置き換えます。
-                                        </p>
-                                        <div class="formula-block">
-                                            $\hat{y}_i = \frac{1}{W} \sum_{j=i-\lfloor W/2 \rfloor}^{i+\lfloor W/2
-                                            \rfloor} y_j$
-                                        </div>
-                                        <h4>ガウシアンフィルタ</h4>
-                                        <p>
-                                            より滑らかな結果が得られるガウス畳み込みによるフィルタです。フィルタの核となるガウス関数の標準偏差 $\sigma$
-                                            をユーザーが直接指定します。$\sigma$ の値が大きいほど、より強力な平滑化がかかります。
-                                        </p>
-                                        <div class="formula-block">
-                                            $$G(x) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{x^2}{2\sigma^2}}$$
-                                        </div>
-
-                                        <h2 class="text-xl font-semibold text-slate-700 mt-8">広域解析ツール</h2>
-                                        <h3>データサンプリング</h3>
-                                        <p>
-                                            複数のCSVファイルから長時間のデータを効率的に扱うため、指定された「データ取得間隔」に基づいてデータをサンプリングします。座標は正規化せず、元データの値をそのまま使用します。
-                                        </p>
-
-                                        <h3>ヒートマップ生成</h3>
-                                        <p>
-                                            対象物の滞在頻度や傾向を可視化するため、ヒートマップを生成します。まず、描画領域全体をユーザー指定の「マス目のサイズ」でグリッドに分割します。
-                                            次に、サンプリングされた各データ点について、それがどのグリッドセルに位置するかを判定します。同一のサンプリング時刻内に複数のデータ点（剛体）が同じセルに存在した場合でも、そのセルは1回のみカウントされます。これにより、各セルが少なくとも1回以上占有されたサンプリング時刻の総数を集計し、ヒートマップの各セルの値とします。
-                                        </p>
-                                        <div class="formula-block">
-                                            $\text{Cell}(i, j) = \sum_{t \in T} \mathbf{1} \left( \exists p \in P_t
-                                            \text{ s.t. } p \in \text{Grid}(i, j) \right)$
-                                        </div>
-                                        <p>
-                                            ここで、$T$はサンプリング時刻の集合、$P_t$は時刻$t$における全データ点の集合、$\mathbf{1}(\cdot)$は指示関数です。
-                                        </p>
-
-                                        <h3>網羅率の計算</h3>
-                                        <p>
-                                            指定された基準範囲（円または正方形）に対して、対象物がどれだけの割合の領域を走破したかを示す「網羅率」を計算します。
-                                            まず、基準範囲内に中心が含まれるヒートマップのグリッドセルの総数 $N_{total}$
-                                            を求めます。次に、これらのセルのうち、対象物が少なくとも1回以上滞在した（ヒートマップの値が1以上である）セルの数 $N_{reached}$
-                                            をカウントします。網羅率 $C$ は以下の式で算出されます。
-                                        </p>
-                                        <div class="formula-block">
-                                            $C [\%] = \frac{N_{reached}}{N_{total}} \times 100$
-                                        </div>
-
-
-                                        <h2 class="text-xl font-semibold text-slate-700 mt-8">基準速度算出ツール</h2>
-
-                                        <h3>角度データのアンラップ</h3>
-                                        <p>
-                                            Motiveから出力される回転角度データは、通常 $\pm 180^\circ$
-                                            の範囲に制限されており、回転がこの範囲を超えると値が不連続に変化（ラップ）します。正確な周期計算のため、このラップを解消（アンラップ）し、連続的な角度変化データに変換します。具体的には、隣接する角度データ
-                                            $A_{i-1}$ と $A_i$ の差が $\pm 180^\circ$ を超えた場合に、$360^\circ$
-                                            のオフセットを加算または減算して補正します。
-                                        </p>
-                                        <div class="formula-block">
-                                            $A'_{i} =
-                                            \begin{cases}
-                                            A'_{i-1} + (A_i - A_{i-1}) - 360 & (A_i - A_{i-1} &gt; 180^\circ) \\
-                                            A'_{i-1} + (A_i - A_{i-1}) + 360 & (A_i - A_{i-1} &lt; -180^\circ) \\
-                                            A'_{i-1} + (A_i - A_{i-1}) & (\text{その他})
-                                            \end{cases}$
-                                        </div>
-
-                                        <h3>回転周期の算出</h3>
-                                        <p>
-                                            アンラップされた角度データから、車輪が1回転（$360^\circ$）するのに要する時間（周期
-                                            $T$）を算出します。まず、回転が開始したと見なされる点（初期角度から $5^\circ$ 以上変化した点）を検出し、その時刻 $t_{start}$
-                                            と角度 $A_{start}$ を記録します。次に、角度が $A_{start} \pm 360^\circ$ に到達する時刻 $t_{end}$
-                                            を探します。
-                                            目標角度を跨ぐ2つのフレーム間で線形補間を行い、正確な到達時刻 $t_{end}$ を推定します。目標角度 $A_{target}$
-                                            を跨ぐ直前と直後の点をそれぞれ $(t_{before}, A_{before})$, $(t_{after}, A_{after})$
-                                            とした場合、到達時刻 $t_{end}$ は以下の線形補間の式で求められます。
-                                        </p>
-                                        <div class="formula-block">
-                                            $t_{end} = t_{before} + (t_{after} - t_{before}) \times \frac{A_{target} -
-                                            A_{before}}{A_{after} - A_{before}}$
-                                        </div>
-                                        <p>
-                                            最終的な周期 $T$ は以下の式で得られます。
-                                        </p>
-                                        <div class="formula-block">
-                                            $T = t_{end} - t_{start}$
-                                        </div>
-
-                                        <h3>基準速度の算出</h3>
-                                        <p>
-                                            算出された周期 $T$ と、ユーザーが入力した車輪の半径 $r$ から、車輪の周速度、すなわち基準速度 $v$ を計算します。角速度 $\omega$
-                                            は $\omega = 2\pi / T$ で与えられるため、基準速度 $v$ は次式で求められます。
-                                        </p>
-                                        <div class="formula-block">
-                                            $v = r \cdot \omega = \frac{2\pi r}{T}$
-                                        </div>
-
-                                        <h2 class="text-xl font-semibold text-slate-700 mt-8">距離測定ツール</h2>
-                                        <h3>距離の算出</h3>
-                                        <p>
-                                            指定された2点（点Aと点B）間の距離を測定します。まず、全解析区間における各点の平均座標 $(\bar{x}, \bar{y}, \bar{z})$
-                                            を算出します。データ点数を $N$、各時刻 $t$ における座標を $(x_t, y_t, z_t)$ とすると、平均座標は次式で計算されます。
-                                        </p>
-                                        <div class="formula-block">
-                                            $\bar{x} = \frac{1}{N} \sum_{t=1}^{N} x_t, \quad \bar{y} = \frac{1}{N}
-                                            \sum_{t=1}^{N} y_t, \quad \bar{z} = \frac{1}{N} \sum_{t=1}^{N} z_t$
-                                        </div>
-                                        <p>
-                                            点Aの平均座標を $(\bar{x}_A, \bar{y}_A, \bar{z}_A)$、点Bの平均座標を $(\bar{x}_B,
-                                            \bar{y}_B, \bar{z}_B)$ としたとき、2点間の距離 $D$ はユークリッド距離の公式を用いて次のように求められます。
-                                        </p>
-                                        <div class="formula-block">
-                                            $D = \sqrt{(\bar{x}_A - \bar{x}_B)^2 + (\bar{y}_A - \bar{y}_B)^2 +
-                                            (\bar{z}_A - \bar{z}_B)^2}$
+                                                <h3>ローパスフィルタ</h3>
+                                                <p>
+                                                    グラフのノイズを低減するために、複数のローパスフィルタから選択できます。
+                                                </p>
+                                                <h4>移動平均フィルタ</h4>
+                                                <p>
+                                                    単純移動平均（Simple Moving Average）法です。指定された「サンプル数」$W$に基づき、ある点 $i$ の値
+                                                    $y_i$ を、その前後
+                                                    $\lfloor W/2 \rfloor$ 個のデータを含む合計 $W$ 個のデータの平均値 $\hat{y}_i$ で置き換えます。
+                                                </p>
+                                                <div class="formula-block">
+                                                    $\hat{y}_i = \frac{1}{W} \sum_{j=i-\lfloor W/2 \rfloor}^{i+\lfloor
+                                                    W/2
+                                                    \rfloor} y_j$
+                                                </div>
+                                                <h4>ガウシアンフィルタ</h4>
+                                                <p>
+                                                    より滑らかな結果が得られるガウス畳み込みによるフィルタです。フィルタの核となるガウス関数の標準偏差 $\sigma$
+                                                    をユーザーが直接指定します。$\sigma$ の値が大きいほど、より強力な平滑化がかかります。
+                                                </p>
+                                                <div class="formula-block">
+                                                    $$G(x) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{x^2}{2\sigma^2}}$$
+                                                </div>
                                         </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="page" id="about">
-                    <div class="max-w-4xl mx-auto space-y-8">
-                        <div class="bg-white p-8 rounded-lg shadow-sm border">
-                            <h1 class="text-2xl font-bold text-slate-800 mb-6 border-b pb-3">このツールについて</h1>
-                            <div class="prose prose-slate max-w-none">
-                                <div>
-                                    <h2 class="text-xl font-semibold text-slate-700">基本情報</h2>
-                                    <div class="mt-3 grid grid-cols-1 gap-y-2 text-sm">
-                                        <p><span class="w-24 inline-block font-medium text-slate-500">アプリ名:</span> Mocap
-                                            Plus</p>
-                                        <p><span class="w-24 inline-block font-medium text-slate-500">バージョン:</span>
-                                            3.3.0</p>
-                                        <p><span class="w-24 inline-block font-medium text-slate-500">製作者:</span>
-                                            西藤 実（中央大学國井研究室→東京科学大学長谷川研究室）</p>
-                                        <p><span class="w-24 inline-block font-medium text-slate-500">リポジトリ:</span> <a
-                                                href="https://github.com/minoru-s/mocap" target="_blank"
-                                                class="text-blue-600 hover:underline">GitHub</a></p>
-                                        <p><span class="w-24 inline-block font-medium text-slate-500">不具合など:</span>
-                                            <a href="https://forms.gle/BEiSADRFBZpHGejb9" target="_blank"
-                                                class="text-blue-600 hover:underline">お問い合わせフォーム</a>
-                                        </p>
-
-                                    </div>
-                                </div>
-                                <br>
-                                <div>
-                                    <h2 class="text-xl font-semibold text-slate-700">更新履歴</h2>
-                                    <ul class="mt-3 list-disc list-inside space-y-2 text-sm">
-                                        <li><span class="font-semibold">2026-04-22:</span>
-                                            3Dモーションビューアを追加し、併せてホーム画面のデザインを刷新しました。</li>
-                                        <li><span class="font-semibold">2026-03-13:</span>
-                                            開発者のGit Hubのユーザ名変更に伴い、アプリのURLを変更しました。</li>
-                                        <li><span class="font-semibold">2025-12-29:</span>
-                                            広域解析ツールにおいて、Z軸を反転する機能，ダウンサンプリングをより細やかに設定できる機能を追加。</li>
-                                        <li><span class="font-semibold">2025-12-17:</span>
-                                            新たにデータトリミングツールを追加。データの範囲を選択し、必要な区間だけを抽出してMotive互換のCSVファイルとして出力する機能を提供。</li>
-                                        <li><span class="font-semibold">2025-12-16:</span>
-                                            新たに距離測定ツールを追加。点Aと点Bの平均座標を計算し、ユークリッド距離を測定する機能を提供。</li>
-                                        <li><span class="font-semibold">2025-12-15:</span>
-                                            基準速度算出ツールにおいて、クウォータニオン形式のエクスポートデータでもトラッキングできるよう改善。</li>
-                                        <li><span class="font-semibold">2025-10-20:</span>
-                                            広域解析ツールを追加し、軌跡・ヒートマップ・網羅率の可視化機能を追加。</li>
-                                        <li><span class="font-semibold">2025-08-07:</span>
-                                            データ解析ツールでファイルを後からでも追加できるよう修正。スクロールしてもメニューが固定されるよう改善。</li>
-                                        <li><span class="font-semibold">2025-08-05:</span>
-                                            ローパスフィルタにガウシアンフィルタを追加。動作区間検出アルゴリズムを修正。その他の潜在的なバグを修正。</li>
-                                        <li><span class="font-semibold">2025-07-05:</span>
-                                            アルゴリズム仕様ページを追加し、数式表示の改善やレイアウト修正などの更新を実施。</li>
-                                        <li><span class="font-semibold">2025-07-04:</span>
-                                            データ解析ツールに分散表示機能と、ユーザが任意に設定できるローパスフィルタ機能を追加。UI/UXの改善。</li>
-                                        <li><span class="font-semibold">2025-07-03:</span> データ解析ツールにグラフ拡大機能を追加。</li>
-                                        <li><span class="font-semibold">2025-06-28:</span> 基準速度の算出ツールを作成、データ解析ツールに統合。
-                                        </li>
-                                        <li><span class="font-semibold">2025-06-21:</span> データ解析ツールの初期リリース。</li>
-                                    </ul>
-                                </div>
-                                <br>
-                                <div>
-                                    <h2 class="text-xl font-semibold text-slate-700">注意事項・免責事項</h2>
-                                    <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600">
-                                        <li>本ツールは、OptiTrackの解析ソフト「Motive」からエクスポートされたCSVファイルに最適化されています。</li>
-                                        <li>データ処理は全てブラウザ内で完結し、添付したデータが外部に送信されることはありません。</li>
-                                        <li>本ツールの利用によって生じた直接的または間接的な損害について、製作者は一切責任を負いません。</li>
-                                        <li>本ツールの作成にあたっては、複数のLLM（Gemini、Claude、Chat GPT、Jules、Antigravity）を利用しています。</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="text-center text-slate-500 text-sm">© 2025 SAITO Minoru.</p>
-                    </div>
-                </div>
-
-                <div class="page flex-1 relative flex-col w-full h-full" id="mocap-viewer"
-                    style="margin: 0; padding: 0; overflow: hidden;">
-                    <div id="playback-viewer">
-
-
-                        <!-- Three.js Canvas -->
-                        <canvas id="three-canvas" class="absolute inset-0 z-0"></canvas>
-
-                        <!-- Tooltip -->
-                        <div id="tooltip"
-                            class="hidden absolute z-[200] bg-gray-900/95 border border-gray-600 text-white text-sm p-3 rounded-lg shadow-xl pointer-events-none whitespace-nowrap backdrop-blur-sm transform -translate-y-full mt-[-15px]">
-                            <!-- 中身はJavaScriptで動的に生成 -->
-                        </div>
-
-                        <!-- Hint: No Selection -->
-                        <div id="no-selection-hint"
-                            class="hidden absolute inset-0 flex items-center justify-center pointer-events-none z-20 transition-opacity duration-300">
-                            <div
-                                class="bg-gray-900/80 backdrop-blur border border-blue-500/50 text-blue-100 px-6 py-5 rounded-xl shadow-2xl flex flex-col items-center gap-2 transform -translate-y-10">
-                                <svg class="w-8 h-8 text-blue-400 animate-bounce" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122">
-                                    </path>
-                                </svg>
-                                <span class="font-bold text-lg tracking-wide">表示する剛体を選択してください</span>
-                                <span class="text-xs text-gray-300">右側のパネルからオブジェクトにチェックを入れてください</span>
-                            </div>
-                        </div>
-
-                        <!-- UI Layer -->
-                        <div id="ui-layer" class="absolute inset-0 flex flex-col pointer-events-none z-10">
-
-                            <!-- Header -->
-                            <div
-                                class="p-5 flex justify-between items-start pointer-events-auto bg-gradient-to-b from-black/60 to-transparent">
-                                <div>
-
-
-                                </div>
-                                <div class="flex gap-3">
-                                    <button id="btn-reset"
-                                        class="hidden glass-btn text-white font-medium px-5 py-2.5 rounded-2xl shadow transition">別のファイルを開く</button>
-                                </div>
-                            </div>
-
-                            <!-- Right Sidebar (Tabs for List and Settings) -->
-                            <div id="right-panel"
-                                class="hidden absolute top-24 right-5 bg-gray-900/90 backdrop-blur border border-gray-700 rounded-xl shadow-2xl w-[280px] max-h-[calc(100vh-200px)] flex flex-col pointer-events-auto transition-opacity duration-300 overflow-hidden">
-
-                                <!-- Tabs -->
-                                <div class="flex border-b border-gray-700 shrink-0 relative items-center pr-1">
-                                    <button id="tab-btn-list"
-                                        class="flex-1 py-2.5 text-xs font-bold text-blue-400 border-b-2 border-blue-500 bg-gray-800/50 transition">オブジェクト</button>
-                                    <button id="tab-btn-settings"
-                                        class="flex-1 py-2.5 text-xs font-bold text-gray-400 hover:text-gray-200 bg-gray-800/20 hover:bg-gray-800/50 transition border-b-2 border-transparent">表示設定</button>
-                                    <button id="minimize-panel-btn"
-                                        class="ml-1 mr-1 p-1 text-gray-400 hover:text-white rounded-md hover:bg-gray-700 transition-colors"
-                                        title="最小化">
-                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                            stroke-width="2">
+                            <div class="bg-white/70 backdrop-blur-xl rounded-xl border border-gray-200/80 shadow-sm">
+                                <div class="p-6 sm:p-8 prose-styles">
+                                    <h2
+                                        class="text-xl font-semibold text-slate-700 mt-0 mb-6 border-b pb-3 flex items-center gap-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="2" stroke="currentColor" class="h-6 w-6 text-gray-500">
                                             <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                                                d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7">
+                                            </path>
                                         </svg>
-                                    </button>
-                                </div>
-
-                                <!-- Tab Content: List -->
-                                <div id="tab-content-list" class="flex flex-col flex-1 min-h-0">
-                                    <!-- 一括表示制御パネル -->
-                                    <div class="p-3 border-b border-gray-700 bg-gray-800/30 space-y-2 shrink-0">
-                                        <label class="flex items-center gap-2 cursor-pointer w-max">
-                                            <input type="checkbox" id="toggle-rb" checked
-                                                class="w-4 h-4 text-blue-600 bg-gray-900 border-gray-600 rounded focus:ring-blue-500 cursor-pointer">
-                                            <span class="text-sm font-bold text-gray-200">剛体を描画</span>
-                                        </label>
-                                        <label class="flex items-center gap-2 cursor-pointer w-max">
-                                            <input type="checkbox" id="toggle-marker" checked
-                                                class="w-4 h-4 text-blue-600 bg-gray-900 border-gray-600 rounded focus:ring-blue-500 cursor-pointer">
-                                            <span class="text-sm font-bold text-gray-200">マーカーを描画</span>
-                                        </label>
-                                        <div class="pl-6 pt-1">
-                                            <label class="flex items-center gap-2 cursor-pointer w-max">
-                                                <input type="checkbox" id="toggle-unassigned-marker"
-                                                    class="w-3 h-3 text-blue-600 bg-gray-900 border-gray-600 rounded focus:ring-blue-500 cursor-pointer">
-                                                <span class="text-xs font-normal text-gray-300">独立マーカーも描画</span>
-                                            </label>
-                                        </div>
-
-                                        <div class="border-t border-gray-600/50 my-2"></div>
-
-                                        <label class="flex items-center gap-2 cursor-pointer w-max">
-                                            <input type="checkbox" id="toggle-rb-trail" checked
-                                                class="w-4 h-4 text-blue-600 bg-gray-900 border-gray-600 rounded focus:ring-blue-500 cursor-pointer">
-                                            <span class="text-sm font-bold text-gray-200">剛体の軌跡を描画</span>
-                                        </label>
-                                        <label class="flex items-center gap-2 cursor-pointer w-max">
-                                            <input type="checkbox" id="toggle-marker-trail" checked
-                                                class="w-4 h-4 text-blue-600 bg-gray-900 border-gray-600 rounded focus:ring-blue-500 cursor-pointer">
-                                            <span class="text-sm font-bold text-gray-200">マーカーの軌跡を描画</span>
-                                        </label>
-                                        <div class="pl-6 pt-1">
-                                            <label class="flex items-center gap-2 cursor-pointer w-max">
-                                                <input type="checkbox" id="toggle-trail-all"
-                                                    class="w-3 h-3 text-blue-600 bg-gray-900 border-gray-600 rounded focus:ring-blue-500 cursor-pointer">
-                                                <span class="text-xs font-normal text-gray-300">最後までの軌跡を最初から表示</span>
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <!-- 剛体リストヘッダ -->
-                                    <div
-                                        class="px-3 py-2 bg-gray-800 border-b border-gray-700 flex justify-between items-center shrink-0">
-                                        <div class="flex items-center gap-2">
-                                            <input type="checkbox" id="toggle-all-rbs"
-                                                class="w-3.5 h-3.5 text-blue-600 bg-gray-900 border-gray-600 rounded cursor-pointer"
-                                                title="全て選択/解除">
-                                            <span
-                                                class="text-xs font-bold text-gray-400 uppercase tracking-wider">剛体リスト</span>
-                                        </div>
-                                        <span id="object-count"
-                                            class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
-                                    </div>
-
-                                    <!-- リストコンテナ -->
-                                    <div id="object-list" class="p-2 space-y-1 overflow-y-auto flex-1 min-h-0">
-                                        <!-- 動的に追加される剛体リスト -->
-                                    </div>
-                                </div>
-
-                                <!-- Tab Content: Settings -->
-                                <div id="tab-content-settings"
-                                    class="hidden flex-col flex-1 min-h-0 p-4 space-y-4 overflow-y-auto bg-gray-800/20">
-                                    <!-- 剛体設定 -->
-                                    <div class="space-y-3 bg-gray-900/50 p-3 rounded border border-gray-700/50">
-                                        <div class="text-xs font-semibold text-blue-400">剛体 (Rigid Body)</div>
-                                        <div class="flex flex-col gap-1">
-                                            <label class="text-xs text-gray-300 flex justify-between">大きさ <span
-                                                    id="val-rb-size">1.0x</span></label>
-                                            <input type="range" id="set-rb-size" min="0.1" max="3.0" step="0.1"
-                                                value="1.0">
-                                        </div>
-                                        <div class="flex flex-col gap-1">
-                                            <label class="text-xs text-gray-300 flex justify-between">透明度 <span
-                                                    id="val-rb-opacity">0.5</span></label>
-                                            <input type="range" id="set-rb-opacity" min="0.0" max="1.0" step="0.1"
-                                                value="0.5">
-                                        </div>
-                                    </div>
-
-                                    <!-- マーカー設定 -->
-                                    <div class="space-y-3 bg-gray-900/50 p-3 rounded border border-gray-700/50">
-                                        <div class="text-xs font-semibold text-blue-400">マーカー (Marker)</div>
-                                        <div class="flex flex-col gap-1">
-                                            <label class="text-xs text-gray-300 flex justify-between">大きさ <span
-                                                    id="val-marker-size">1.0x</span></label>
-                                            <input type="range" id="set-marker-size" min="0.1" max="3.0" step="0.1"
-                                                value="1.0">
-                                        </div>
-                                        <div class="flex flex-col gap-1">
-                                            <label class="text-xs text-gray-300 flex justify-between">透明度 <span
-                                                    id="val-marker-opacity">1.0</span></label>
-                                            <input type="range" id="set-marker-opacity" min="0.0" max="1.0" step="0.1"
-                                                value="1.0">
-                                        </div>
-                                    </div>
-
-                                    <!-- 軌跡設定 -->
-                                    <div class="space-y-3 bg-gray-900/50 p-3 rounded border border-gray-700/50">
-                                        <div class="text-xs font-semibold text-blue-400">軌跡 (Trail)</div>
-                                        <div class="flex flex-col gap-1">
-                                            <label class="text-xs text-gray-300 flex justify-between">太さ <span
-                                                    id="val-trail-width">2px</span></label>
-                                            <input type="range" id="set-trail-width" min="1" max="10" step="1"
-                                                value="2">
-                                            <span
-                                                class="text-[10px] text-gray-500 leading-tight mt-1">*OS/ブラウザの仕様により線の太さが変わらない場合があります。</span>
-                                        </div>
-                                        <div class="flex flex-col gap-1">
-                                            <label class="text-xs text-gray-300 flex justify-between">透明度 <span
-                                                    id="val-trail-opacity">0.8</span></label>
-                                            <input type="range" id="set-trail-opacity" min="0.0" max="1.0" step="0.1"
-                                                value="0.8">
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <!-- Center Drop Zone -->
-                            <div id="drop-zone-container"
-                                class="flex-1 flex items-center justify-center pointer-events-auto">
-                                <label for="file-input" id="drop-zone"
-                                    class="bg-gray-900/80 backdrop-blur border-2 border-dashed border-gray-500 rounded-2xl p-10 text-center cursor-pointer hover:border-blue-500 hover:bg-gray-800/90 transition shadow-2xl max-w-lg w-full mx-4">
-                                    <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                    </svg>
-                                    <p class="text-xl font-semibold mb-2">Motive CSVをドロップ</p>
-                                    <p class="text-sm text-gray-400">またはクリックしてファイルを選択</p>
-                                    <input type="file" id="file-input" class="hidden" accept=".csv">
-                                </label>
-                            </div>
-
-                            <button id="maximize-panel-btn"
-                                class="hidden absolute top-24 right-5 bg-gray-900/90 backdrop-blur border border-gray-700 text-white p-2.5 rounded-lg shadow-xl hover:bg-gray-800 transition-colors pointer-events-auto z-20 group"
-                                title="設定パネルを開く">
-                                <svg class="w-6 h-6 text-gray-400 group-hover:text-white"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
-                                </svg>
-                            </button>
-
-                            <!-- Loading Overlay -->
-                            <div id="loading-overlay"
-                                class="hidden flex-1 flex items-center justify-center pointer-events-auto">
-                                <div
-                                    class="bg-gray-900/90 backdrop-blur border border-gray-700 p-8 rounded-xl text-center max-w-md w-full mx-4 shadow-2xl">
-                                    <div class="text-lg font-medium mb-2" id="loading-status">ファイルを解析中...</div>
-                                    <div class="text-blue-400 text-4xl font-bold mb-4"><span id="progress-pct">0</span>%
-                                    </div>
-                                    <div class="w-full bg-gray-700 rounded-full h-3 mb-4 overflow-hidden">
-                                        <div id="progress-bar" class="bg-blue-500 h-full transition-all duration-300"
-                                            style="width: 0%"></div>
-                                    </div>
-                                    <p id="error-details"
-                                        class="text-xs text-gray-400 text-left bg-gray-800 p-3 rounded">
-                                        💡 <span class="font-semibold text-gray-300">最適化技術:</span>
-                                        自前の高速CSVパーサとFloat32Arrayによるバッファリングを用いて、大容量データを安全かつ高速に処理しています。
+                                        広域解析ツール
+                                    </h2>
+                                    <h3>データサンプリング</h3>
+                                    <p>
+                                        複数のCSVファイルから長時間のデータを効率的に扱うため、指定された「データ取得間隔」に基づいてデータをサンプリングします。座標は正規化せず、元データの値をそのまま使用します。
                                     </p>
+
+                                    <h3>ヒートマップ生成</h3>
+                                    <p>
+                                        対象物の滞頻度や傾向を可視化するため、ヒートマップを生成します。まず、描画領域全体をユーザー指定の「マス目のサイズ」でグリッドに分割します。
+                                        次に、サンプリングされた各データ点について、それがどのグリッドセルに位置するかを判定します。同一のサンプリング時刻内に複数のデータ点（剛体）が同じセルに存在した場合でも、そのセルは1回のみカウントされます。これにより、各セルが少なくとも1回以上占有されたサンプリング時刻の総数を集計し、ヒートマップの各セルの値とします。
+                                    </p>
+                                    <div class="formula-block">
+                                        $\text{Cell}(i, j) = \sum_{t \in T} \mathbf{1} \left( \exists p \in P_t
+                                        \text{ s.t. } p \in \text{Grid}(i, j) \right)$
+                                    </div>
+                                    <p>
+                                        ここで、$T$はサンプリング時刻の集合、$P_t$は時刻$t$における全データ点の集合、$\mathbf{1}(\cdot)$は指示関数です。
+                                    </p>
+
+                                    <h3>網羅率の計算</h3>
+                                    <p>
+                                        指定された基準範囲（円または正方形）に対して、対象物がどれだけの割合の領域を走破したかを示す「網羅率」を計算します。
+                                        まず、基準範囲内に中心が含まれるヒートマップのグリッドセルの総数 $N_{total}$
+                                        を求めます。次に、これらのセルのうち、対象物が少なくとも1回以上滞在した（ヒートマップの値が1以上である）セルの数 $N_{reached}$
+                                        をカウントします。網羅率 $C$ は以下の式で算出されます。
+                                    </p>
+                                    <div class="formula-block">
+                                        $C [\%] = \frac{N_{reached}}{N_{total}} \times 100$
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="flex-1"></div>
-
-                            <!-- Control Panel -->
-                            <div id="control-panel"
-                                class="hidden bg-gray-900/95 backdrop-blur border-t border-gray-700 p-4 pointer-events-auto shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
-                                <div class="flex items-center gap-6 max-w-6xl mx-auto w-full">
-                                    <button id="btn-play"
-                                        class="w-14 h-14 shrink-0 flex items-center justify-center glass-btn rounded-2xl focus:outline-none transition transform hover:scale-105 active:scale-95 shadow-lg text-white">
-                                        <svg id="icon-play" class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M8 5v14l11-7z" />
+                            <div class="bg-white/70 backdrop-blur-xl rounded-xl border border-gray-200/80 shadow-sm">
+                                <div class="p-6 sm:p-8 prose-styles">
+                                    <h2
+                                        class="text-xl font-semibold text-slate-700 mt-0 mb-6 border-b pb-3 flex items-center gap-3">
+                                        <svg class="h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="8" width="18" height="8" rx="1" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <line x1="6" y1="12" x2="6" y2="15" stroke-linecap="round" />
+                                            <line x1="12" y1="12" x2="12" y2="15" stroke-linecap="round" />
+                                            <line x1="18" y1="12" x2="18" y2="15" stroke-linecap="round" />
+                                            <line x1="9" y1="13" x2="9" y2="15" stroke-linecap="round" />
+                                            <line x1="15" y1="13" x2="15" y2="15" stroke-linecap="round" />
                                         </svg>
-                                        <svg id="icon-pause" class="w-7 h-7 hidden" fill="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                                        </svg>
-                                    </button>
-
-                                    <div class="flex-1 flex flex-col justify-center gap-2">
-                                        <input type="range" id="seek-bar" min="0" max="100" value="0" step="0.001"
-                                            class="w-full mocap-slider">
-                                        <div class="flex justify-between text-sm font-mono text-gray-400">
-                                            <span id="time-current">00:00.000</span>
-                                            <span id="time-total">00:00.000</span>
-                                        </div>
+                                        距離測定ツール
+                                    </h2>
+                                    <h3>距離の算出</h3>
+                                    <p>
+                                        指定された2点（点Aと点B）間の距離を測定します。まず、全解析区間における各点の平均座標 $(\bar{x}, \bar{y}, \bar{z})$
+                                        を算出します。データ点数を $N$、各時刻 $t$ における座標を $(x_t, y_t, z_t)$ とすると、平均座標は次式で計算されます。
+                                    </p>
+                                    <div class="formula-block">
+                                        $\bar{x} = \frac{1}{N} \sum_{t=1}^{N} x_t, \quad \bar{y} = \frac{1}{N}
+                                        \sum_{t=1}^{N} y_t, \quad \bar{z} = \frac{1}{N} \sum_{t=1}^{N} z_t$
                                     </div>
+                                    <p>
+                                        点Aの平均座標を $(\bar{x}_A, \bar{y}_A, \bar{z}_A)$、点Bの平均座標を $(\bar{x}_B,
+                                        \bar{y}_B, \bar{z}_B)$ としたとき、2点間の距離 $D$ はユークリッド距離の公式を用いて次のように求められます。
+                                    </p>
+                                    <div class="formula-block">
+                                        $D = \sqrt{(\bar{x}_A - \bar{x}_B)^2 + (\bar{y}_A - \bar{y}_B)^2 +
+                                        (\bar{z}_A - \bar{z}_B)^2}$
+                                    </div>
+                                </div>
+                            </div>
 
-                                    <div
-                                        class="flex items-center gap-3 shrink-0 bg-gray-800 py-2 px-3 rounded-lg border border-gray-700">
-                                        <label
-                                            class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Speed</label>
-                                        <select id="playback-rate"
-                                            class="bg-transparent text-sm font-semibold border-none focus:ring-0 cursor-pointer outline-none">
-                                            <option value="0.25">x0.25</option>
-                                            <option value="0.5">x0.5</option>
-                                            <option value="1" selected>x1.0</option>
-                                            <option value="2">x2.0</option>
-                                            <option value="4">x4.0</option>
-                                            <option value="8">x8.0</option>
-                                            <option value="16">x16.0</option>
-                                        </select>
+                            <div class="bg-white/70 backdrop-blur-xl rounded-xl border border-gray-200/80 shadow-sm">
+                                <div class="p-6 sm:p-8 prose-styles">
+                                    <h2
+                                        class="text-xl font-semibold text-slate-700 mt-0 mb-6 border-b pb-3 flex items-center gap-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" class="text-gray-500">
+                                            <path d="M15.6 3.3a10 10 0 1 0 5.7 5.7" />
+                                            <circle cx="12" cy="12" r="2" />
+                                            <path d="M13.4 10.6 19 5" />
+                                        </svg>
+                                        基準速度算出ツール
+                                    </h2>
+
+                                    <h3>角度データのアンラップ</h3>
+                                    <p>
+                                        Motiveから出力される回転角度データは、通常 $\pm 180^\circ$
+                                        の範囲に制限されており、回転がこの範囲を超えると値が不連続に変化（ラップ）します。正確な周期計算のため、このラップを解消（アンラップ）し、連続的な角度変化データに変換します。具体的には、隣接する角度データ
+                                        $A_{i-1}$ と $A_i$ の差が $\pm 180^\circ$ を超えた場合に、$360^\circ$
+                                        のオフセットを加算または減算して補正します。
+                                    </p>
+                                    <div class="formula-block">
+                                        $A'_{i} =
+                                        \begin{cases}
+                                        A'_{i-1} + (A_i - A_{i-1}) - 360 & (A_i - A_{i-1} > 180^\circ) \\
+                                        A'_{i-1} + (A_i - A_{i-1}) + 360 & (A_i - A_{i-1} < -180^\circ) \\ A'_{i-1} +
+                                            (A_i - A_{i-1}) & (\text{その他}) \end{cases}$ </div>
+
+                                            <h3>回転周期の算出</h3>
+                                            <p>
+                                                アンラップされた角度データから、車輪が1回転（$360^\circ$）するのに要する時間（周期
+                                                $T$）を算出します。まず、回転が開始したと見なされる点（初期角度から $5^\circ$ 以上変化した点）を検出し、その時刻
+                                                $t_{start}$
+                                                と角度 $A_{start}$ を記録します。次に、角度が $A_{start} \pm 360^\circ$ に到達する時刻
+                                                $t_{end}$
+                                                を探します。
+                                                目標角度を跨ぐ2つのフレーム間で線形補間を行い、正確な到達時刻 $t_{end}$ を推定します。目標角度 $A_{target}$
+                                                を跨ぐ直前と直後の点をそれぞれ $(t_{before}, A_{before})$, $(t_{after}, A_{after})$
+                                                とした場合、到達時刻 $t_{end}$ は以下の線形補間の式で求められます。
+                                            </p>
+                                            <div class="formula-block">
+                                                $t_{end} = t_{before} + (t_{after} - t_{before}) \times \frac{A_{target}
+                                                -
+                                                A_{before}}{A_{after} - A_{before}}$
+                                            </div>
+                                            <p>
+                                                最終的な周期 $T$ は以下の式で得られます。
+                                            </p>
+                                            <div class="formula-block">
+                                                $T = t_{end} - t_{start}$
+                                            </div>
+
+                                            <h3>基準速度の算出</h3>
+                                            <p>
+                                                算出された周期 $T$ と、ユーザーが入力した車輪の半径 $r$ から、車輪の周速度、すなわち基準速度 $v$ を計算します。角速度
+                                                $\omega$
+                                                は $\omega = 2\pi / T$ で与えられるため、基準速度 $v$ は次式で求められます。
+                                            </p>
+                                            <div class="formula-block">
+                                                $v = r \cdot \omega = \frac{2\pi r}{T}$
+                                            </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                        <div class="page" id="about">
+                            <div class="max-w-4xl mx-auto space-y-8">
+                                <div class="bg-white p-8 rounded-lg shadow-sm border">
+                                    <h1 class="text-2xl font-bold text-slate-800 mb-6 border-b pb-3">このツールについて</h1>
+                                    <div class="prose prose-slate max-w-none">
+                                        <div>
+                                            <h2 class="text-xl font-semibold text-slate-700">基本情報</h2>
+                                            <div class="mt-3 grid grid-cols-1 gap-y-2 text-sm">
+                                                <p><span
+                                                        class="w-24 inline-block font-medium text-slate-500">アプリ名:</span>
+                                                    Mocap
+                                                    Plus</p>
+                                                <p><span
+                                                        class="w-24 inline-block font-medium text-slate-500">バージョン:</span>
+                                                    3.3.0</p>
+                                                <p><span
+                                                        class="w-24 inline-block font-medium text-slate-500">製作者:</span>
+                                                    西藤 実（中央大学國井研究室→東京科学大学長谷川研究室）</p>
+                                                <p><span
+                                                        class="w-24 inline-block font-medium text-slate-500">リポジトリ:</span>
+                                                    <a href="https://github.com/minoru-s/mocap" target="_blank"
+                                                        class="text-blue-600 hover:underline">GitHub</a>
+                                                </p>
+                                                <p><span
+                                                        class="w-24 inline-block font-medium text-slate-500">不具合など:</span>
+                                                    <a href="https://forms.gle/BEiSADRFBZpHGejb9" target="_blank"
+                                                        class="text-blue-600 hover:underline">お問い合わせフォーム</a>
+                                                </p>
 
-                    </div>
-                </div>
-
-                <div class="page" id="data-trimming">
-                    <div class="max-w-7xl mx-auto space-y-8">
-
-
-                        <section class="bg-white p-6 rounded-lg shadow-sm border">
-                            <h2 class="text-xl font-semibold text-center mb-6">1. データ入力</h2>
-                            <div class="flex flex-col items-center gap-3">
-                                <label for="csv-file-trimming"
-                                    class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2 px-5 border border-slate-300 rounded-md shadow-sm transition-colors">
-                                    ファイルを選択
-                                </label>
-                                <input type="file" id="csv-file-trimming" class="hidden" accept=".csv">
-                                <p id="file-name-trimming" class="text-sm text-slate-500 mt-2">ファイルが選択されていません</p>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div>
+                                            <h2 class="text-xl font-semibold text-slate-700">更新履歴</h2>
+                                            <ul class="mt-3 list-disc list-inside space-y-2 text-sm">
+                                                <li><span class="font-semibold">2026-05-01:</span>
+                                                    使い方ガイドとアルゴリズム仕様の内容を更新しました。</li>
+                                                <li><span class="font-semibold">2026-04-22:</span>
+                                                    3Dモーションビューアを追加し、併せてホーム画面のデザインを刷新しました。</li>
+                                                <li><span class="font-semibold">2026-03-13:</span>
+                                                    開発者のGit Hubのユーザ名変更に伴い、アプリのURLを変更しました。</li>
+                                                <li><span class="font-semibold">2025-12-29:</span>
+                                                    広域解析ツールにおいて、Z軸を反転する機能，ダウンサンプリングをより細やかに設定できる機能を追加。</li>
+                                                <li><span class="font-semibold">2025-12-17:</span>
+                                                    新たにデータトリミングツールを追加。データの範囲を選択し、必要な区間だけを抽出してMotive互換のCSVファイルとして出力する機能を提供。
+                                                </li>
+                                                <li><span class="font-semibold">2025-12-16:</span>
+                                                    新たに距離測定ツールを追加。点Aと点Bの平均座標を計算し、ユークリッド距離を測定する機能を提供。</li>
+                                                <li><span class="font-semibold">2025-12-15:</span>
+                                                    基準速度算出ツールにおいて、クウォータニオン形式のエクスポートデータでもトラッキングできるよう改善。</li>
+                                                <li><span class="font-semibold">2025-10-20:</span>
+                                                    広域解析ツールを追加し、軌跡・ヒートマップ・網羅率の可視化機能を追加。</li>
+                                                <li><span class="font-semibold">2025-08-07:</span>
+                                                    データ解析ツールでファイルを後からでも追加できるよう修正。スクロールしてもメニューが固定されるよう改善。</li>
+                                                <li><span class="font-semibold">2025-08-05:</span>
+                                                    ローパスフィルタにガウシアンフィルタを追加。動作区間検出アルゴリズムを修正。その他の潜在的なバグを修正。</li>
+                                                <li><span class="font-semibold">2025-07-05:</span>
+                                                    アルゴリズム仕様ページを追加し、数式表示の改善やレイアウト修正などの更新を実施。</li>
+                                                <li><span class="font-semibold">2025-07-04:</span>
+                                                    データ解析ツールに分散表示機能と、ユーザが任意に設定できるローパスフィルタ機能を追加。UI/UXの改善。</li>
+                                                <li><span class="font-semibold">2025-07-03:</span> データ解析ツールにグラフ拡大機能を追加。
+                                                </li>
+                                                <li><span class="font-semibold">2025-06-28:</span>
+                                                    基準速度の算出ツールを作成、データ解析ツールに統合。
+                                                </li>
+                                                <li><span class="font-semibold">2025-06-21:</span> データ解析ツールの初期リリース。</li>
+                                            </ul>
+                                        </div>
+                                        <br>
+                                        <div>
+                                            <h2 class="text-xl font-semibold text-slate-700">注意事項・免責事項</h2>
+                                            <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600">
+                                                <li>本ツールは、OptiTrackの解析ソフト「Motive」からエクスポートされたCSVファイルに最適化されています。</li>
+                                                <li>データ処理は全てブラウザ内で完結し、添付したデータが外部に送信されることはありません。</li>
+                                                <li>本ツールの利用によって生じた直接的または間接的な損害について、製作者は一切責任を負いません。</li>
+                                                <li>本ツールの作成にあたっては、複数のLLM（Gemini、Claude、Chat
+                                                    GPT、Jules、Antigravity）を利用しています。</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-center text-slate-500 text-sm">© 2025 SAITO Minoru.</p>
                             </div>
-                        </section>
+                        </div>
 
-                        <section id="trimming-ui" class="hidden bg-white p-6 rounded-lg shadow-sm border">
-                            <h2 class="text-xl font-semibold text-center mb-6">2. 範囲選択</h2>
+                        <div class="page flex-1 relative flex-col w-full h-full" id="mocap-viewer"
+                            style="margin: 0; padding: 0; overflow: hidden;">
+                            <div id="playback-viewer">
 
-                            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                                <div class="lg:col-span-1 space-y-6">
-                                    <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-2">表示設定</label>
-                                        <div class="flex items-center mb-2">
-                                            <input type="checkbox" id="trimming-downsample"
-                                                class="h-4 w-4 text-blue-600 rounded border-slate-300">
-                                            <label for="trimming-downsample"
-                                                class="ml-2 text-sm text-slate-700">描画をダウンサンプリング</label>
+
+                                <!-- Three.js Canvas -->
+                                <canvas id="three-canvas" class="absolute inset-0 z-0"></canvas>
+
+                                <!-- Tooltip -->
+                                <div id="tooltip"
+                                    class="hidden absolute z-[200] bg-gray-900/95 border border-gray-600 text-white text-sm p-3 rounded-lg shadow-xl pointer-events-none whitespace-nowrap backdrop-blur-sm transform -translate-y-full mt-[-15px]">
+                                    <!-- 中身はJavaScriptで動的に生成 -->
+                                </div>
+
+                                <!-- Hint: No Selection -->
+                                <div id="no-selection-hint"
+                                    class="hidden absolute inset-0 flex items-center justify-center pointer-events-none z-20 transition-opacity duration-300">
+                                    <div
+                                        class="bg-gray-900/80 backdrop-blur border border-blue-500/50 text-blue-100 px-6 py-5 rounded-xl shadow-2xl flex flex-col items-center gap-2 transform -translate-y-10">
+                                        <svg class="w-8 h-8 text-blue-400 animate-bounce" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122">
+                                            </path>
+                                        </svg>
+                                        <span class="font-bold text-lg tracking-wide">表示する剛体を選択してください</span>
+                                        <span class="text-xs text-gray-300">右側のパネルからオブジェクトにチェックを入れてください</span>
+                                    </div>
+                                </div>
+
+                                <!-- UI Layer -->
+                                <div id="ui-layer" class="absolute inset-0 flex flex-col pointer-events-none z-10">
+
+                                    <!-- Header -->
+                                    <div
+                                        class="p-5 flex justify-between items-start pointer-events-auto bg-gradient-to-b from-black/60 to-transparent">
+                                        <div>
+
+
+                                        </div>
+                                        <div class="flex gap-3">
+                                            <button id="btn-reset"
+                                                class="hidden glass-btn text-white font-medium px-5 py-2.5 rounded-2xl shadow transition">別のファイルを開く</button>
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-2">剛体選択</label>
-                                        <select id="trimming-rigidbody-select"
-                                            class="block w-full text-sm border-slate-300 rounded-md shadow-sm p-2">
-                                            <option value="all">すべて表示</option>
-                                        </select>
-                                    </div>
+                                    <!-- Right Sidebar (Tabs for List and Settings) -->
+                                    <div id="right-panel"
+                                        class="hidden absolute top-24 right-5 bg-gray-900/90 backdrop-blur border border-gray-700 rounded-xl shadow-2xl w-[280px] max-h-[calc(100vh-200px)] flex flex-col pointer-events-auto transition-opacity duration-300 overflow-hidden">
 
-                                    <div class="p-4 bg-slate-50 rounded border">
-                                        <label
-                                            class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">選択範囲
-                                            (秒)</label>
-                                        <div class="space-y-3">
-                                            <div>
-                                                <label class="block text-xs text-slate-400">開始 (Start)</label>
-                                                <input type="number" id="trim-start-time"
-                                                    class="block w-full text-sm border-slate-300 rounded-md p-1.5"
-                                                    step="0.001">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs text-slate-400">終了 (End)</label>
-                                                <input type="number" id="trim-end-time"
-                                                    class="block w-full text-sm border-slate-300 rounded-md p-1.5"
-                                                    step="0.001">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs text-slate-400">期間 (Duration)</label>
-                                                <input type="number" id="trim-duration"
-                                                    class="block w-full text-sm border-slate-300 rounded-md p-1.5 bg-slate-100"
-                                                    readonly>
-                                            </div>
-                                            <button id="reset-zoom-trimming"
-                                                class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 py-1.5 rounded text-xs font-medium">ズームリセット</button>
+                                        <!-- Tabs -->
+                                        <div class="flex border-b border-gray-700 shrink-0 relative items-center pr-1">
+                                            <button id="tab-btn-list"
+                                                class="flex-1 py-2.5 text-xs font-bold text-blue-400 border-b-2 border-blue-500 bg-gray-800/50 transition">オブジェクト</button>
+                                            <button id="tab-btn-settings"
+                                                class="flex-1 py-2.5 text-xs font-bold text-gray-400 hover:text-gray-200 bg-gray-800/20 hover:bg-gray-800/50 transition border-b-2 border-transparent">表示設定</button>
+                                            <button id="minimize-panel-btn"
+                                                class="ml-1 mr-1 p-1 text-gray-400 hover:text-white rounded-md hover:bg-gray-700 transition-colors"
+                                                title="最小化">
+                                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                                                </svg>
+                                            </button>
                                         </div>
+
+                                        <!-- Tab Content: List -->
+                                        <div id="tab-content-list" class="flex flex-col flex-1 min-h-0">
+                                            <!-- 一括表示制御パネル -->
+                                            <div class="p-3 border-b border-gray-700 bg-gray-800/30 space-y-2 shrink-0">
+                                                <label class="flex items-center gap-2 cursor-pointer w-max">
+                                                    <input type="checkbox" id="toggle-rb" checked
+                                                        class="w-4 h-4 text-blue-600 bg-gray-900 border-gray-600 rounded focus:ring-blue-500 cursor-pointer">
+                                                    <span class="text-sm font-bold text-gray-200">剛体を描画</span>
+                                                </label>
+                                                <label class="flex items-center gap-2 cursor-pointer w-max">
+                                                    <input type="checkbox" id="toggle-marker" checked
+                                                        class="w-4 h-4 text-blue-600 bg-gray-900 border-gray-600 rounded focus:ring-blue-500 cursor-pointer">
+                                                    <span class="text-sm font-bold text-gray-200">マーカーを描画</span>
+                                                </label>
+                                                <div class="pl-6 pt-1">
+                                                    <label class="flex items-center gap-2 cursor-pointer w-max">
+                                                        <input type="checkbox" id="toggle-unassigned-marker"
+                                                            class="w-3 h-3 text-blue-600 bg-gray-900 border-gray-600 rounded focus:ring-blue-500 cursor-pointer">
+                                                        <span class="text-xs font-normal text-gray-300">独立マーカーも描画</span>
+                                                    </label>
+                                                </div>
+
+                                                <div class="border-t border-gray-600/50 my-2"></div>
+
+                                                <label class="flex items-center gap-2 cursor-pointer w-max">
+                                                    <input type="checkbox" id="toggle-rb-trail" checked
+                                                        class="w-4 h-4 text-blue-600 bg-gray-900 border-gray-600 rounded focus:ring-blue-500 cursor-pointer">
+                                                    <span class="text-sm font-bold text-gray-200">剛体の軌跡を描画</span>
+                                                </label>
+                                                <label class="flex items-center gap-2 cursor-pointer w-max">
+                                                    <input type="checkbox" id="toggle-marker-trail" checked
+                                                        class="w-4 h-4 text-blue-600 bg-gray-900 border-gray-600 rounded focus:ring-blue-500 cursor-pointer">
+                                                    <span class="text-sm font-bold text-gray-200">マーカーの軌跡を描画</span>
+                                                </label>
+                                                <div class="pl-6 pt-1">
+                                                    <label class="flex items-center gap-2 cursor-pointer w-max">
+                                                        <input type="checkbox" id="toggle-trail-all"
+                                                            class="w-3 h-3 text-blue-600 bg-gray-900 border-gray-600 rounded focus:ring-blue-500 cursor-pointer">
+                                                        <span
+                                                            class="text-xs font-normal text-gray-300">最後までの軌跡を最初から表示</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <!-- 剛体リストヘッダ -->
+                                            <div
+                                                class="px-3 py-2 bg-gray-800 border-b border-gray-700 flex justify-between items-center shrink-0">
+                                                <div class="flex items-center gap-2">
+                                                    <input type="checkbox" id="toggle-all-rbs"
+                                                        class="w-3.5 h-3.5 text-blue-600 bg-gray-900 border-gray-600 rounded cursor-pointer"
+                                                        title="全て選択/解除">
+                                                    <span
+                                                        class="text-xs font-bold text-gray-400 uppercase tracking-wider">剛体リスト</span>
+                                                </div>
+                                                <span id="object-count"
+                                                    class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+                                            </div>
+
+                                            <!-- リストコンテナ -->
+                                            <div id="object-list" class="p-2 space-y-1 overflow-y-auto flex-1 min-h-0">
+                                                <!-- 動的に追加される剛体リスト -->
+                                            </div>
+                                        </div>
+
+                                        <!-- Tab Content: Settings -->
+                                        <div id="tab-content-settings"
+                                            class="hidden flex-col flex-1 min-h-0 p-4 space-y-4 overflow-y-auto bg-gray-800/20">
+                                            <!-- 剛体設定 -->
+                                            <div class="space-y-3 bg-gray-900/50 p-3 rounded border border-gray-700/50">
+                                                <div class="text-xs font-semibold text-blue-400">剛体 (Rigid Body)</div>
+                                                <div class="flex flex-col gap-1">
+                                                    <label class="text-xs text-gray-300 flex justify-between">大きさ <span
+                                                            id="val-rb-size">1.0x</span></label>
+                                                    <input type="range" id="set-rb-size" min="0.1" max="3.0" step="0.1"
+                                                        value="1.0">
+                                                </div>
+                                                <div class="flex flex-col gap-1">
+                                                    <label class="text-xs text-gray-300 flex justify-between">透明度 <span
+                                                            id="val-rb-opacity">0.5</span></label>
+                                                    <input type="range" id="set-rb-opacity" min="0.0" max="1.0"
+                                                        step="0.1" value="0.5">
+                                                </div>
+                                            </div>
+
+                                            <!-- マーカー設定 -->
+                                            <div class="space-y-3 bg-gray-900/50 p-3 rounded border border-gray-700/50">
+                                                <div class="text-xs font-semibold text-blue-400">マーカー (Marker)</div>
+                                                <div class="flex flex-col gap-1">
+                                                    <label class="text-xs text-gray-300 flex justify-between">大きさ <span
+                                                            id="val-marker-size">1.0x</span></label>
+                                                    <input type="range" id="set-marker-size" min="0.1" max="3.0"
+                                                        step="0.1" value="1.0">
+                                                </div>
+                                                <div class="flex flex-col gap-1">
+                                                    <label class="text-xs text-gray-300 flex justify-between">透明度 <span
+                                                            id="val-marker-opacity">1.0</span></label>
+                                                    <input type="range" id="set-marker-opacity" min="0.0" max="1.0"
+                                                        step="0.1" value="1.0">
+                                                </div>
+                                            </div>
+
+                                            <!-- 軌跡設定 -->
+                                            <div class="space-y-3 bg-gray-900/50 p-3 rounded border border-gray-700/50">
+                                                <div class="text-xs font-semibold text-blue-400">軌跡 (Trail)</div>
+                                                <div class="flex flex-col gap-1">
+                                                    <label class="text-xs text-gray-300 flex justify-between">太さ <span
+                                                            id="val-trail-width">2px</span></label>
+                                                    <input type="range" id="set-trail-width" min="1" max="10" step="1"
+                                                        value="2">
+                                                    <span
+                                                        class="text-[10px] text-gray-500 leading-tight mt-1">*OS/ブラウザの仕様により線の太さが変わらない場合があります。</span>
+                                                </div>
+                                                <div class="flex flex-col gap-1">
+                                                    <label class="text-xs text-gray-300 flex justify-between">透明度 <span
+                                                            id="val-trail-opacity">0.8</span></label>
+                                                    <input type="range" id="set-trail-opacity" min="0.0" max="1.0"
+                                                        step="0.1" value="0.8">
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
 
-                                    <button id="export-trimmed-csv"
-                                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded shadow-sm">
-                                        選択範囲をエクスポート
+                                    <!-- Center Drop Zone -->
+                                    <div id="drop-zone-container"
+                                        class="flex-1 flex items-center justify-center pointer-events-auto">
+                                        <label for="file-input" id="drop-zone"
+                                            class="bg-gray-900/80 backdrop-blur border-2 border-dashed border-gray-500 rounded-2xl p-10 text-center cursor-pointer hover:border-blue-500 hover:bg-gray-800/90 transition shadow-2xl max-w-lg w-full mx-4">
+                                            <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                            </svg>
+                                            <p class="text-xl font-semibold mb-2">Motive CSVをドロップ</p>
+                                            <p class="text-sm text-gray-400">またはクリックしてファイルを選択</p>
+                                            <input type="file" id="file-input" class="hidden" accept=".csv">
+                                        </label>
+                                    </div>
+
+                                    <button id="maximize-panel-btn"
+                                        class="hidden absolute top-24 right-5 bg-gray-900/90 backdrop-blur border border-gray-700 text-white p-2.5 rounded-lg shadow-xl hover:bg-gray-800 transition-colors pointer-events-auto z-20 group"
+                                        title="設定パネルを開く">
+                                        <svg class="w-6 h-6 text-gray-400 group-hover:text-white"
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+                                        </svg>
                                     </button>
+
+                                    <!-- Loading Overlay -->
+                                    <div id="loading-overlay"
+                                        class="hidden flex-1 flex items-center justify-center pointer-events-auto">
+                                        <div
+                                            class="bg-gray-900/90 backdrop-blur border border-gray-700 p-8 rounded-xl text-center max-w-md w-full mx-4 shadow-2xl">
+                                            <div class="text-lg font-medium mb-2" id="loading-status">ファイルを解析中...</div>
+                                            <div class="text-blue-400 text-4xl font-bold mb-4"><span
+                                                    id="progress-pct">0</span>%
+                                            </div>
+                                            <div class="w-full bg-gray-700 rounded-full h-3 mb-4 overflow-hidden">
+                                                <div id="progress-bar"
+                                                    class="bg-blue-500 h-full transition-all duration-300"
+                                                    style="width: 0%"></div>
+                                            </div>
+                                            <p id="error-details"
+                                                class="text-xs text-gray-400 text-left bg-gray-800 p-3 rounded">
+                                                💡 <span class="font-semibold text-gray-300">最適化技術:</span>
+                                                自前の高速CSVパーサとFloat32Arrayによるバッファリングを用いて、大容量データを安全かつ高速に処理しています。
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1"></div>
+
+                                    <!-- Control Panel -->
+                                    <div id="control-panel"
+                                        class="hidden bg-gray-900/95 backdrop-blur border-t border-gray-700 p-4 pointer-events-auto shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+                                        <div class="flex items-center gap-6 max-w-6xl mx-auto w-full">
+                                            <button id="btn-play"
+                                                class="w-14 h-14 shrink-0 flex items-center justify-center glass-btn rounded-2xl focus:outline-none transition transform hover:scale-105 active:scale-95 shadow-lg text-white">
+                                                <svg id="icon-play" class="w-7 h-7" fill="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path d="M8 5v14l11-7z" />
+                                                </svg>
+                                                <svg id="icon-pause" class="w-7 h-7 hidden" fill="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                                                </svg>
+                                            </button>
+
+                                            <div class="flex-1 flex flex-col justify-center gap-2">
+                                                <input type="range" id="seek-bar" min="0" max="100" value="0"
+                                                    step="0.001" class="w-full mocap-slider">
+                                                <div class="flex justify-between text-sm font-mono text-gray-400">
+                                                    <span id="time-current">00:00.000</span>
+                                                    <span id="time-total">00:00.000</span>
+                                                </div>
+                                            </div>
+
+                                            <div
+                                                class="flex items-center gap-3 shrink-0 bg-gray-800 py-2 px-3 rounded-lg border border-gray-700">
+                                                <label
+                                                    class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Speed</label>
+                                                <select id="playback-rate"
+                                                    class="bg-transparent text-sm font-semibold border-none focus:ring-0 cursor-pointer outline-none">
+                                                    <option value="0.25">x0.25</option>
+                                                    <option value="0.5">x0.5</option>
+                                                    <option value="1" selected>x1.0</option>
+                                                    <option value="2">x2.0</option>
+                                                    <option value="4">x4.0</option>
+                                                    <option value="8">x8.0</option>
+                                                    <option value="16">x16.0</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div class="lg:col-span-3 space-y-4">
-                                    <div class="h-48 bg-slate-50 border rounded p-2 relative">
-                                        <canvas id="trim-chart-x"></canvas>
-                                    </div>
-                                    <div class="h-48 bg-slate-50 border rounded p-2 relative">
-                                        <canvas id="trim-chart-y"></canvas>
-                                    </div>
-                                    <div class="h-48 bg-slate-50 border rounded p-2 relative">
-                                        <canvas id="trim-chart-z"></canvas>
-                                    </div>
-                                    <p class="text-xs text-center text-slate-400">グラフ上でドラッグしてズーム / シフト+ドラッグで範囲選択 /
-                                        範囲端をドラッグして調整</p>
-                                </div>
+
                             </div>
-                        </section>
-                    </div>
-                </div>
+                        </div>
+
+                        <div class="page" id="data-trimming">
+                            <div class="max-w-7xl mx-auto space-y-8">
+
+
+                                <section class="bg-white p-6 rounded-lg shadow-sm border">
+                                    <h2 class="text-xl font-semibold text-center mb-6">1. データ入力</h2>
+                                    <div class="flex flex-col items-center gap-3">
+                                        <label for="csv-file-trimming"
+                                            class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2 px-5 border border-slate-300 rounded-md shadow-sm transition-colors">
+                                            ファイルを選択
+                                        </label>
+                                        <input type="file" id="csv-file-trimming" class="hidden" accept=".csv">
+                                        <p id="file-name-trimming" class="text-sm text-slate-500 mt-2">ファイルが選択されていません
+                                        </p>
+                                    </div>
+                                </section>
+
+                                <section id="trimming-ui" class="hidden bg-white p-6 rounded-lg shadow-sm border">
+                                    <h2 class="text-xl font-semibold text-center mb-6">2. 範囲選択</h2>
+
+                                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                                        <div class="lg:col-span-1 space-y-6">
+                                            <div>
+                                                <label
+                                                    class="block text-sm font-medium text-slate-700 mb-2">表示設定</label>
+                                                <div class="flex items-center mb-2">
+                                                    <input type="checkbox" id="trimming-downsample"
+                                                        class="h-4 w-4 text-blue-600 rounded border-slate-300">
+                                                    <label for="trimming-downsample"
+                                                        class="ml-2 text-sm text-slate-700">描画をダウンサンプリング</label>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label
+                                                    class="block text-sm font-medium text-slate-700 mb-2">剛体選択</label>
+                                                <select id="trimming-rigidbody-select"
+                                                    class="block w-full text-sm border-slate-300 rounded-md shadow-sm p-2">
+                                                    <option value="all">すべて表示</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="p-4 bg-slate-50 rounded border">
+                                                <label
+                                                    class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">選択範囲
+                                                    (秒)</label>
+                                                <div class="space-y-3">
+                                                    <div>
+                                                        <label class="block text-xs text-slate-400">開始 (Start)</label>
+                                                        <input type="number" id="trim-start-time"
+                                                            class="block w-full text-sm border-slate-300 rounded-md p-1.5"
+                                                            step="0.001">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-xs text-slate-400">終了 (End)</label>
+                                                        <input type="number" id="trim-end-time"
+                                                            class="block w-full text-sm border-slate-300 rounded-md p-1.5"
+                                                            step="0.001">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-xs text-slate-400">期間
+                                                            (Duration)</label>
+                                                        <input type="number" id="trim-duration"
+                                                            class="block w-full text-sm border-slate-300 rounded-md p-1.5 bg-slate-100"
+                                                            readonly>
+                                                    </div>
+                                                    <button id="reset-zoom-trimming"
+                                                        class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 py-1.5 rounded text-xs font-medium">ズームリセット</button>
+                                                </div>
+                                            </div>
+
+                                            <button id="export-trimmed-csv"
+                                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded shadow-sm">
+                                                選択範囲をエクスポート
+                                            </button>
+                                        </div>
+
+                                        <div class="lg:col-span-3 space-y-4">
+                                            <div class="h-48 bg-slate-50 border rounded p-2 relative">
+                                                <canvas id="trim-chart-x"></canvas>
+                                            </div>
+                                            <div class="h-48 bg-slate-50 border rounded p-2 relative">
+                                                <canvas id="trim-chart-y"></canvas>
+                                            </div>
+                                            <div class="h-48 bg-slate-50 border rounded p-2 relative">
+                                                <canvas id="trim-chart-z"></canvas>
+                                            </div>
+                                            <p class="text-xs text-center text-slate-400">グラフ上でドラッグしてズーム / シフト+ドラッグで範囲選択
+                                                /
+                                                範囲端をドラッグして調整</p>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
             </main>
         </div>
     </div>
