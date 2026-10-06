@@ -1,6 +1,59 @@
         document.addEventListener('DOMContentLoaded', () => {
             // --- Global Variables ---
             let modalChartInstance = null;
+            let trajectory3DSession = null;
+            let nextFileId = 0;
+            const escapeHtml = MocapCsv.escapeHtml;
+
+            function findNamedInput(selector, filename, bodyName) {
+                return Array.from(document.querySelectorAll(selector)).find(input => input.dataset.filename === filename && (bodyName === undefined || input.dataset.bodyname === bodyName));
+            }
+
+            function syncTrajectoryVisibility() {
+                if (!trajectory3DSession) return;
+                const page = document.getElementById('wide-area-analysis');
+                const view = document.getElementById('trajectory-3d-view-wide');
+                if (page.classList.contains('active') && !view.classList.contains('hidden') && !document.hidden) trajectory3DSession.start();
+                else trajectory3DSession.stop();
+            }
+
+            function disposeTrajectory3D() {
+                if (trajectory3DSession) trajectory3DSession.destroy();
+                trajectory3DSession = null;
+            }
+            document.addEventListener('visibilitychange', syncTrajectoryVisibility);
+
+            // Avoid passing one argument per sample to Math.min/Math.max.
+            function pointBounds(points, xValue, yValue) {
+                let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+                for (const point of points) {
+                    const x = xValue(point), y = yValue(point);
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+                    if (y < minY) minY = y;
+                    if (y > maxY) maxY = y;
+                }
+                return { minX, maxX, minY, maxY };
+            }
+
+            function chartDisplayPoints(points, limit = 6000) {
+                if (points.length <= limit) return points;
+                const result = [points[0]];
+                const bucketSize = Math.ceil(points.length / Math.floor((limit - 2) / 4));
+                for (let start = 1; start < points.length - 1; start += bucketSize) {
+                    const end = Math.min(points.length - 1, start + bucketSize);
+                    let minX = start, maxX = start, minY = start, maxY = start;
+                    for (let i = start + 1; i < end; i++) {
+                        if (points[i].x < points[minX].x) minX = i;
+                        if (points[i].x > points[maxX].x) maxX = i;
+                        if (points[i].y < points[minY].y) minY = i;
+                        if (points[i].y > points[maxY].y) maxY = i;
+                    }
+                    for (const index of [...new Set([minX, maxX, minY, maxY])].sort((a, b) => a - b)) result.push(points[index]);
+                }
+                result.push(points[points.length - 1]);
+                return result;
+            }
 
             // --- SPA Navigation ---
             const pages = document.querySelectorAll('.page');
@@ -47,6 +100,7 @@
             }
 
             function showPage(pageId) {
+                if (!Array.from(pages).some(page => page.id === pageId)) pageId = 'home';
                 pages.forEach(page => {
                     page.classList.remove('active');
                 });
@@ -82,6 +136,8 @@
                 } else {
                     document.body.classList.remove('theater-mode');
                 }
+                window.dispatchEvent(new CustomEvent('mocap-pagechange', { detail: { pageId } }));
+                syncTrajectoryVisibility();
             }
 
             if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', openMobileMenu);
@@ -116,7 +172,9 @@
             }
 
             // --- DATA ANALYSIS TOOL SCRIPT ---
-            const fileDataStore = {};
+            const fileDataStore = Object.create(null);
+            const pendingFiles = new Set();
+            let normalLoadGeneration = 0;
             const chartInstances = {};
             let allInstantaneousVelocities = [];
             let lastProcessedData = [];
@@ -151,26 +209,22 @@
 
             // --- Low Pass Filter Helpers ---
             function applyMovingAverageFilter(dataPoints, windowSize) {
-                if (windowSize <= 1 || dataPoints.length < windowSize) return dataPoints;
-
+                windowSize = Math.floor(windowSize);
+                if (!Number.isFinite(windowSize) || windowSize <= 1 || dataPoints.length < windowSize) return dataPoints;
                 const smoothedPoints = [];
-                const halfWindow = Math.floor(windowSize / 2);
-
+                const left = Math.floor((windowSize - 1) / 2), right = windowSize - 1 - left;
+                let start = 0, end = 0, sumY = 0, count = 0;
                 for (let i = 0; i < dataPoints.length; i++) {
-                    const start = Math.max(0, i - halfWindow);
-                    const end = Math.min(dataPoints.length - 1, i + halfWindow);
-                    let sumY = 0;
-                    for (let j = start; j <= end; j++) {
-                        sumY += dataPoints[j].y;
-                    }
-                    const avgY = sumY / (end - start + 1);
-                    smoothedPoints.push({ x: dataPoints[i].x, y: avgY });
+                    const nextStart = Math.max(0, i - left), nextEnd = Math.min(dataPoints.length, i + right + 1);
+                    while (end < nextEnd) { if (Number.isFinite(dataPoints[end].y)) { sumY += dataPoints[end].y; count++; } end++; }
+                    while (start < nextStart) { if (Number.isFinite(dataPoints[start].y)) { sumY -= dataPoints[start].y; count--; } start++; }
+                    smoothedPoints.push({ x: dataPoints[i].x, y: dataPoints[i].y === null ? null : count ? sumY / count : null });
                 }
                 return smoothedPoints;
             }
 
             function applyGaussianFilter(dataPoints, sigma) {
-                if (sigma <= 0 || dataPoints.length < 3) return dataPoints;
+                if (!Number.isFinite(sigma) || sigma <= 0 || dataPoints.length < 3) return dataPoints;
 
                 const radius = Math.ceil(sigma * 3);
                 const kernel = [];
@@ -189,12 +243,16 @@
 
                 for (let i = 0; i < dataPoints.length; i++) {
                     let weightedSumY = 0;
+                    let weight = 0;
                     for (let j = 0; j < kernel.length; j++) {
                         const dataIndex = i + j - halfKernel;
                         const clampedIndex = Math.max(0, Math.min(dataPoints.length - 1, dataIndex));
-                        weightedSumY += dataPoints[clampedIndex].y * kernel[j];
+                        if (Number.isFinite(dataPoints[clampedIndex].y)) {
+                            weightedSumY += dataPoints[clampedIndex].y * kernel[j];
+                            weight += kernel[j];
+                        }
                     }
-                    smoothedPoints.push({ x: dataPoints[i].x, y: weightedSumY });
+                    smoothedPoints.push({ x: dataPoints[i].x, y: dataPoints[i].y === null ? null : weight ? weightedSumY / weight : null });
                 }
                 return smoothedPoints;
             }
@@ -318,12 +376,20 @@
 
             function clearAllFiles(tool) {
                 if (tool === 'data-analysis') {
+                    normalLoadGeneration++;
+                    pendingFiles.clear();
                     for (const key in fileDataStore) { delete fileDataStore[key]; }
                     fileListDiv.innerHTML = '';
                     rigidbodyListDiv.innerHTML = '';
                     rigidbodySelectionSection.classList.add('hidden');
                     resultsSection.classList.add('hidden');
                     csvFileInput.value = '';
+                    lastProcessedData = [];
+                    allInstantaneousVelocities = [];
+                    for (const key of Object.keys(chartInstances)) {
+                        chartInstances[key].destroy();
+                        delete chartInstances[key];
+                    }
                 }
             }
 
@@ -332,23 +398,25 @@
                 if (files.length === 0) return;
 
                 if (tool === 'data-analysis') {
+                    const generation = normalLoadGeneration;
                     rigidbodySelectionSection.classList.remove('hidden');
 
                     files.forEach(file => {
-                        if (fileDataStore[file.name]) {
+                        if (fileDataStore[file.name] || pendingFiles.has(file.name)) {
                             console.log(`File "${file.name}" is already loaded. Skipping.`);
                             return;
                         }
+                        pendingFiles.add(file.name);
 
-                        const fileId = `file-${file.name.replace(/[^a-zA-Z0-9]/g, '')}`;
+                        const fileId = `file-${++nextFileId}`;
                         const fileElement = document.createElement('div');
                         fileElement.className = 'bg-slate-50 p-2.5 rounded-md flex items-center justify-between border text-sm';
                         fileElement.innerHTML = `
-                            <span class="text-slate-700 truncate pr-4">${file.name}</span>
+                            <span class="text-slate-700 truncate pr-4">${escapeHtml(file.name)}</span>
                             <div class="flex items-center flex-shrink-0">
                                 <label for="speed-${fileId}" class="text-xs text-slate-500 mr-2 whitespace-nowrap">基準速度(m/s):</label>
                                 <div class="flex">
-                                    <input type="number" id="speed-${fileId}" data-filename="${file.name}" class="reference-speed-input bg-white border border-slate-300 rounded-l-md w-20 p-1 text-right text-sm" step="0.1" value="1.0">
+                                    <input type="number" id="speed-${fileId}" data-filename="${escapeHtml(file.name)}" class="reference-speed-input bg-white border border-slate-300 rounded-l-md w-20 p-1 text-right text-sm" step="0.1" value="1.0">
                                     <button type="button" class="paste-btn p-1.5 bg-slate-100 hover:bg-slate-200 border border-l-0 border-slate-300 rounded-r-md" data-target-id="speed-${fileId}" title="ペースト">
                                         <svg class="h-4 w-4 text-slate-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" /></svg>
                                     </button>
@@ -356,17 +424,26 @@
                             </div>
                         `;
                         fileListDiv.appendChild(fileElement);
-                        Papa.parse(file, {
+                        MocapCsv.parse(file, {
                             complete: (results) => {
+                                if (generation !== normalLoadGeneration) return;
                                 try {
                                     const rigidBodies = extractRigidBodies(results.data);
-                                    fileDataStore[file.name] = { rawData: results.data, rigidBodies };
+                                    fileDataStore[file.name] = { rigidBodies };
                                     displayRigidBodySelector(file.name, rigidBodies);
                                 } catch (error) {
+                                    fileElement.remove();
                                     alert(`ファイル "${file.name}" の解析中にエラーが発生しました: ${error.message}`);
+                                } finally {
+                                    pendingFiles.delete(file.name);
                                 }
                             },
-                            error: (error) => alert(`ファイル "${file.name}" の読み込みに失敗しました: ${error.message}`)
+                            error: (error) => {
+                                if (generation !== normalLoadGeneration) return;
+                                pendingFiles.delete(file.name);
+                                fileElement.remove();
+                                alert(`ファイル "${file.name}" の読み込みに失敗しました: ${error.message}`);
+                            }
                         });
                     });
                 }
@@ -384,29 +461,24 @@
                 if (typeRowIndex === -1 || nameRowIndex === -1 || propertyRowIndex === -1 || dataStartIndex === -1) throw new Error("CSVのヘッダー形式が不正です。");
 
                 const [typeRow, nameRow, propertyRow] = [data[typeRowIndex], data[nameRowIndex], data[propertyRowIndex]];
-                const rigidBodies = {};
+                const rigidBodies = Object.create(null);
+                const nameCounts = Object.create(null);
 
                 for (let i = 2; i < typeRow.length; i++) {
                     if (typeRow[i] === 'Rigid Body' && propertyRow[i] === 'Position') {
-                        const name = nameRow[i];
+                        const rawName = nameRow[i];
+                        const count = nameCounts[rawName] = (nameCounts[rawName] || 0) + 1;
+                        let name = count === 1 ? rawName : `${rawName} (${count})`;
+                        while (Object.hasOwn(rigidBodies, name)) name += " (2)";
                         if (!rigidBodies[name]) rigidBodies[name] = { name: name, posIndices: {} };
                         rigidBodies[name].posIndices = { X: i, Y: i + 1, Z: i + 2 };
                         i += 2;
                     }
                 }
 
-                const dataUnit = document.querySelector('input[name="data-unit"]:checked').value;
-                const conversionFactor = dataUnit === 'mm' ? 1000 : 1;
                 const actualData = data.slice(dataStartIndex).filter(row => row.length > 1 && row[1] !== '');
                 Object.values(rigidBodies).forEach(body => {
-                    body.data = actualData.map(row => ({
-                        time: parseFloat(row[1]),
-                        pos: {
-                            X: parseFloat(row[body.posIndices.X]) / conversionFactor,
-                            Y: parseFloat(row[body.posIndices.Y]) / conversionFactor,
-                            Z: parseFloat(row[body.posIndices.Z]) / conversionFactor
-                        }
-                    })).filter(d => !isNaN(d.time) && !isNaN(d.pos.X));
+                    body.data = MocapCsv.positionSeries(actualData, body.posIndices, 1);
                 });
                 return Object.values(rigidBodies);
             }
@@ -414,7 +486,7 @@
             function displayRigidBodySelector(filename, rigidBodies) {
                 const fileGroupContainer = document.createElement('div');
                 fileGroupContainer.className = 'mb-4';
-                let listHTML = `<h3 class="text-md font-semibold text-slate-700 mb-2 border-b pb-2">[${filename}] の剛体</h3><div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-2 gap-x-4">`;
+                let listHTML = `<h3 class="text-md font-semibold text-slate-700 mb-2 border-b pb-2">[${escapeHtml(filename)}] の剛体</h3><div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-2 gap-x-4">`;
                 if (rigidBodies.length === 0) {
                     listHTML += `<p class="text-slate-500 col-span-full text-sm">剛体データが見つかりませんでした。</p>`;
                 } else {
@@ -423,12 +495,12 @@
                         listHTML += `
                         <div class="rigidbody-item-container">
                             <label class="flex items-center space-x-2 p-2 rounded-md hover:bg-slate-100 cursor-pointer w-full">
-                                <input type="checkbox" class="rigidbody-checkbox form-checkbox h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" data-filename="${filename}" data-bodyname="${body.name}">
-                                <span class="text-slate-800 text-sm">${body.name}</span>
+                                <input type="checkbox" class="rigidbody-checkbox form-checkbox h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" data-filename="${escapeHtml(filename)}" data-bodyname="${escapeHtml(body.name)}">
+                                <span class="text-slate-800 text-sm">${escapeHtml(body.name)}</span>
                             </label>
                             <div class="legend-input-container hidden pl-7 mt-1">
                                 <label class="text-xs text-slate-500">凡例名:</label>
-                                <input type="text" class="legend-label-input mt-1 block w-full rounded-md shadow-sm p-1.5 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500" data-filename="${filename}" data-bodyname="${body.name}" value="${defaultLabel}">
+                                <input type="text" class="legend-label-input mt-1 block w-full rounded-md shadow-sm p-1.5 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500" data-filename="${escapeHtml(filename)}" data-bodyname="${escapeHtml(body.name)}" value="${escapeHtml(defaultLabel)}">
                             </div>
                         </div>`;
                     });
@@ -454,7 +526,7 @@
                 document.querySelectorAll('.rigidbody-checkbox:checked').forEach(cb => {
                     const filename = cb.dataset.filename;
                     const bodyName = cb.dataset.bodyname;
-                    const labelInput = document.querySelector(`.legend-label-input[data-filename="${filename}"][data-bodyname="${bodyName}"]`);
+                    const labelInput = findNamedInput('.legend-label-input', filename, bodyName);
                     const label = labelInput ? labelInput.value : `${filename} - ${bodyName}`;
                     selectedBodies.push({ filename, bodyName, label });
                 });
@@ -528,11 +600,12 @@
                 return selectedBodies.map(selection => {
                     const { filename, bodyName, label } = selection;
                     const body = fileDataStore[filename].rigidBodies.find(b => b.name === bodyName);
-                    const referenceSpeedInput = document.querySelector(`input[data-filename="${filename}"]`);
+                    const referenceSpeedInput = findNamedInput('.reference-speed-input', filename);
                     if (!referenceSpeedInput) throw new Error(`基準速度の入力が見つかりません: ${filename}`);
                     const referenceSpeed = parseFloat(referenceSpeedInput.value);
 
-                    if (!body || isNaN(referenceSpeed)) throw new Error(`データまたは基準速度が見つかりません: ${filename} - ${bodyName}`);
+                    if (!body || !Number.isFinite(referenceSpeed) || referenceSpeed < 0) throw new Error(`データまたは基準速度が不正です: ${filename} - ${bodyName}`);
+                    if (body.data.setFactor) body.data.setFactor(document.querySelector('input[name="data-unit"]:checked').value === 'mm' ? 1000 : 1);
 
                     const motionRange = findMotionRange(body.data, travelAxis, motionDetectionSettings);
                     if (!motionRange) {
@@ -559,14 +632,14 @@
                         d.trajectory_x = d.pos[chartXAxisName] - initialPos[chartXAxisName];
                         d.trajectory_y = d.pos[chartYAxisName] - initialPos[chartYAxisName];
 
-                        if (i === 0) { d.instVelocity = 0; } else {
+                        if (i === 0) { d.instVelocity = null; } else {
                             const dt = d.time - workingData[i - 1].time;
                             const dd = d.distance - workingData[i - 1].distance;
-                            d.instVelocity = dt > 0 ? dd / dt : 0;
+                            d.instVelocity = dt > 0 ? dd / dt : null;
                         }
                         const u = referenceSpeed, v = d.instVelocity;
-                        if (u > 0 && v >= 0) d.slipRate = (u > v) ? (1 - (v / u)) * 100 : (1 - (u / v)) * 100;
-                        else d.slipRate = 0;
+                        if (Number.isFinite(v) && u > 0 && v >= 0) d.slipRate = (u > v) ? (1 - (v / u)) * 100 : (1 - (u / v)) * 100;
+                        else d.slipRate = null;
                     });
 
                     const totalTime = workingData[workingData.length - 1].time;
@@ -578,10 +651,10 @@
                         avgSlipRate = (referenceSpeed > avgVelocity) ? (1 - (avgVelocity / referenceSpeed)) * 100 : (1 - (referenceSpeed / avgVelocity)) * 100;
                     }
 
-                    const n = workingData.length;
+                    const velocityValues = workingData.map(d => d.instVelocity).filter(Number.isFinite);
+                    const n = velocityValues.length;
                     let velocitySampleVariance = 0, velocityUnbiasedVariance = 0;
                     if (n > 1) {
-                        const velocityValues = workingData.map(d => d.instVelocity);
                         const meanVel = velocityValues.reduce((a, b) => a + b, 0) / n;
                         const sumOfSquares = velocityValues.map(v => (v - meanVel) ** 2).reduce((a, b) => a + b, 0);
                         velocitySampleVariance = sumOfSquares / n;
@@ -589,7 +662,7 @@
                     }
 
                     let slipRateSampleVariance = 0, slipRateUnbiasedVariance = 0;
-                    const slipRateValues = workingData.map(d => d.slipRate).filter(sr => sr !== undefined && !isNaN(sr));
+                    const slipRateValues = workingData.map(d => d.slipRate).filter(Number.isFinite);
                     const m = slipRateValues.length;
                     if (m > 1) {
                         const meanSlip = slipRateValues.reduce((a, b) => a + b, 0) / m;
@@ -600,9 +673,9 @@
 
                     workingData.forEach(d => {
                         allInstantaneousVelocities.push({
-                            "ファイル名": filename, "剛体名": bodyName, "凡例名": label, "時間 (s)": d.time.toFixed(3),
-                            "距離 (m)": d.distance.toFixed(4), "微小速度 (m/s)": d.instVelocity.toFixed(4),
-                            "スリップ率 (%)": d.slipRate.toFixed(2), "鉛直変位 (m)": d.verticalDisp.toFixed(4),
+                            "ファイル名": filename, "剛体名": bodyName, "凡例名": label, "時間 (s)": Number(d.time.toFixed(6)),
+                            "距離 (m)": Number(d.distance.toFixed(4)), "微小速度 (m/s)": d.instVelocity === null ? '' : Number(d.instVelocity.toFixed(4)),
+                            "スリップ率 (%)": d.slipRate === null ? '' : Number(d.slipRate.toFixed(2)), "鉛直変位 (m)": Number(d.verticalDisp.toFixed(4)),
                         });
                     });
                     return { name: label, data: workingData, avgVelocity, avgSlipRate, velocitySampleVariance, velocityUnbiasedVariance, slipRateSampleVariance, slipRateUnbiasedVariance, referenceSpeed };
@@ -610,35 +683,40 @@
             }
 
             function findMotionRange(data, travelAxis, settings) {
-                const pos = data.map(d => d.pos[travelAxis]);
-                if (pos.length < 20) return { start: 0, end: pos.length };
+                const length = data.length;
+                const at = i => data.coordinate ? data.coordinate(i, travelAxis) : data[i].pos[travelAxis];
+                if (length < 20) return { start: 0, end: length };
 
-                const overallMax = Math.max(...pos);
-                const overallMin = Math.min(...pos);
+                let overallMax = -Infinity, overallMin = Infinity;
+                for (let i = 0; i < length; i++) {
+                    const value = at(i);
+                    if (value > overallMax) overallMax = value;
+                    if (value < overallMin) overallMin = value;
+                }
                 const overallRange = overallMax - overallMin;
                 if (overallRange === 0) return null;
 
                 const margin = overallRange * settings.multiplier;
 
-                const initialValue = pos[0];
+                const initialValue = at(0);
                 const startLowerBound = initialValue - margin;
                 const startUpperBound = initialValue + margin;
                 let startIndex = 0;
-                for (let i = 1; i < pos.length; i++) {
-                    if (pos[i] < startLowerBound || pos[i] > startUpperBound) {
+                for (let i = 1; i < length; i++) {
+                    if (at(i) < startLowerBound || at(i) > startUpperBound) {
                         startIndex = i;
                         break;
                     }
                 }
                 if (startIndex === 0) { console.warn("動作開始が検出できませんでした。"); return null; }
 
-                const finalValue = pos[pos.length - 1];
+                const finalValue = at(length - 1);
                 const endLowerBound = finalValue - margin;
                 const endUpperBound = finalValue + margin;
 
-                let endIndex = pos.length;
-                for (let i = pos.length - 1; i >= startIndex; i--) {
-                    if (pos[i] < endLowerBound || pos[i] > endUpperBound) {
+                let endIndex = length;
+                for (let i = length - 1; i >= startIndex; i--) {
+                    if (at(i) < endLowerBound || at(i) > endUpperBound) {
                         endIndex = i + 1;
                         break;
                     }
@@ -657,7 +735,7 @@
                     const item = document.createElement('div');
                     item.className = 'p-3 bg-slate-50/70 rounded-md border';
                     item.innerHTML = `
-                        <div class="font-semibold text-sm text-blue-700">${result.name}</div>
+                        <div class="font-semibold text-sm text-blue-700">${escapeHtml(result.name)}</div>
                         <div class="mt-2 pl-2 text-sm text-slate-700 space-y-1">
                             <div>
                                 平均速度: <span class="font-medium">${result.avgVelocity.toFixed(3)} m/s</span>
@@ -730,10 +808,10 @@
                     }
 
                     return {
-                        velocity: { ...base, data: velocityData },
-                        slip: { ...base, data: slipData },
-                        vertical: { ...base, data: verticalData },
-                        trajectory: { ...base, data: trajectoryData }
+                        velocity: { ...base, data: chartDisplayPoints(velocityData) },
+                        slip: { ...base, data: chartDisplayPoints(slipData) },
+                        vertical: { ...base, data: chartDisplayPoints(verticalData) },
+                        trajectory: { ...base, data: chartDisplayPoints(trajectoryData) }
                     };
                 });
 
@@ -900,14 +978,16 @@
                     alert('ダウンロードするデータがありません。');
                     return;
                 }
-                const csv = Papa.unparse(allInstantaneousVelocities);
+                const csv = Papa.unparse(allInstantaneousVelocities, { escapeFormulae: true });
                 const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
+                const url = URL.createObjectURL(blob);
+                link.href = url;
                 link.setAttribute('download', 'instantaneous_velocities.csv');
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
             }
 
             async function handleDownload(chartId, format) {
@@ -916,8 +996,13 @@
 
                 downloadOverlay.classList.remove('hidden');
 
-                const exportWidth = document.getElementById('export-width').value;
-                const exportHeight = document.getElementById('export-height').value;
+                const exportWidth = Number(document.getElementById('export-width').value);
+                const exportHeight = Number(document.getElementById('export-height').value);
+                if (!Number.isInteger(exportWidth) || !Number.isInteger(exportHeight) || exportWidth <= 0 || exportHeight <= 0 || exportWidth > 8192 || exportHeight > 8192 || exportWidth * exportHeight > 16000000) {
+                    downloadOverlay.classList.add('hidden');
+                    alert('画像サイズは各辺8192px以下、合計1600万画素以下の正の整数で指定してください。');
+                    return;
+                }
 
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = exportWidth;
@@ -937,7 +1022,13 @@
                 await new Promise(resolve => setTimeout(resolve, 500));
 
                 try {
-                    const canvas = await html2canvas(tempCanvas, { backgroundColor: '#FFFFFF', scale: 2 });
+                    const canvas = tempCanvas;
+                    const exportContext = canvas.getContext('2d');
+                    exportContext.save();
+                    exportContext.globalCompositeOperation = 'destination-over';
+                    exportContext.fillStyle = '#FFFFFF';
+                    exportContext.fillRect(0, 0, canvas.width, canvas.height);
+                    exportContext.restore();
 
                     if (format === 'png') {
                         const image = canvas.toDataURL('image/png', 1.0);
@@ -957,7 +1048,7 @@
                             unit: 'px',
                             format: [canvas.width, canvas.height]
                         });
-                        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, canvas.width, canvas.height);
                         pdf.save(`${chartId}.pdf`);
                     }
                 } catch (e) {
@@ -993,9 +1084,14 @@
                 copyBtnStd.addEventListener('click', handleCopyStd);
             }
 
+            let parseVersionStd = 0;
+
             function handleFileSelectStd(event) {
                 const file = event.target.files[0];
                 if (!file) return;
+                const version = ++parseVersionStd;
+                parsedCsvDataStd = null;
+                parametersSectionStd.classList.add('hidden');
 
                 fileNameDisplayStd.textContent = file.name;
                 parametersSectionStd.classList.add('hidden');
@@ -1003,8 +1099,10 @@
                 errorDisplayStd.classList.add('hidden');
                 loadingIndicatorStd.classList.remove('hidden');
 
-                Papa.parse(file, {
+                MocapCsv.parse(file, {
+                    mode: 'rotation',
                     complete: (results) => {
+                        if (version !== parseVersionStd) return;
                         try {
                             parseCsvAndSetupUIStd(results.data);
                         } catch (e) {
@@ -1014,6 +1112,7 @@
                         }
                     },
                     error: (error) => {
+                        if (version !== parseVersionStd) return;
                         showErrorStd(`CSVファイルの読み込みに失敗しました: ${error.message}`);
                         loadingIndicatorStd.classList.add('hidden');
                     }
@@ -1051,7 +1150,9 @@
             }
 
             function extractRigidBodiesStd(csvData, headerInfo) {
-                const rigidBodies = {};
+                const rigidBodies = Object.create(null);
+                const nameCounts = Object.create(null);
+                let currentBody;
                 const typeRow = csvData[headerInfo.typeRowIndex];
                 const nameRow = csvData[headerInfo.nameRowIndex];
                 const propertyRow = csvData[headerInfo.propertyRowIndex];
@@ -1059,12 +1160,15 @@
 
                 for (let i = 2; i < typeRow.length; i++) {
                     if (typeRow[i] === 'Rigid Body' && propertyRow[i] === 'Rotation') {
-                        const name = nameRow[i];
-                        if (!rigidBodies[name]) {
-                            rigidBodies[name] = { name: name, rotation: {} };
+                        if (i === 2 || typeRow[i - 1] !== 'Rigid Body' || propertyRow[i - 1] !== 'Rotation' || nameRow[i - 1] !== nameRow[i]) {
+                            const rawName = nameRow[i];
+                            const count = nameCounts[rawName] = (nameCounts[rawName] || 0) + 1;
+                            let name = count === 1 ? rawName : `${rawName} (${count})`;
+                            while (Object.hasOwn(rigidBodies, name)) name += " (2)";
+                            currentBody = rigidBodies[name] = { name, rotation: Object.create(null) };
                         }
                         const axisName = dataHeaderRow[i];
-                        rigidBodies[name].rotation[axisName] = i;
+                        currentBody.rotation[axisName] = i;
                     }
                 }
                 return rigidBodies;
@@ -1079,12 +1183,12 @@
                 );
                 if (firstMatchIndex !== -1) { defaultIndex = firstMatchIndex; }
                 bodyNames.forEach((name, index) => {
-                    const id = `body-radio-std-${name.replace(/\s+/g, '-')}`;
+                    const id = `body-radio-std-${index}`;
                     const div = document.createElement('div');
                     div.className = 'flex items-center';
                     div.innerHTML = `
-                        <input id="${id}" type="radio" value="${name}" name="rigidbody-select-std" class="rigidbody-radio-std h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500" ${index === defaultIndex ? 'checked' : ''}>
-                        <label for="${id}" class="ml-3 block text-sm text-slate-900">${name}</label>
+                        <input id="${id}" type="radio" value="${escapeHtml(name)}" name="rigidbody-select-std" class="rigidbody-radio-std h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500" ${index === defaultIndex ? 'checked' : ''}>
+                        <label for="${id}" class="ml-3 block text-sm text-slate-900">${escapeHtml(name)}</label>
                     `;
                     rigidbodyContainerStd.appendChild(div);
                 });
@@ -1103,7 +1207,7 @@
                     showErrorStd("解析する剛体を選択してください。"); return;
                 }
                 const radiusCm = parseFloat(radiusInputStd.value);
-                if (isNaN(radiusCm) || radiusCm <= 0) {
+                if (!Number.isFinite(radiusCm) || radiusCm <= 0) {
                     showErrorStd("半径には正の数値を入力してください。"); return;
                 }
                 const radiusM = radiusCm / 100.0;
@@ -1221,67 +1325,28 @@
                 return unwrapped;
             }
 
-            function findRotationPeriodStd(times, unwrappedAngles) {
-                let currentIndex = 0;
-
-                // Try to find a valid rotation period by searching through the data
-                while (currentIndex < unwrappedAngles.length - 10) {
-                    // 1. Find start of motion relative to currentIndex
-                    let motionStartIndex = -1;
-                    const baseAngle = unwrappedAngles[currentIndex];
-
-                    for (let i = currentIndex + 1; i < unwrappedAngles.length; i++) {
-                        if (Math.abs(unwrappedAngles[i] - baseAngle) > 5) {
-                            motionStartIndex = i;
-                            break;
-                        }
+            function findRotationPeriodStd(times, angles) {
+                if (times.length !== angles.length || times.length < 2) return null;
+                // Maintain angle extrema; any starting phase can form a turn.
+                // Equal-angle dwell updates its timestamp instead of adding rest.
+                let minIndex = 0, maxIndex = 0;
+                for (let i = 1; i < angles.length; i++) {
+                    if (!Number.isFinite(times[i]) || !Number.isFinite(angles[i]) || times[i] <= times[i - 1]) continue;
+                    const upward = angles[i] - angles[minIndex] >= 360 - 1e-8;
+                    const downward = angles[maxIndex] - angles[i] >= 360 - 1e-8;
+                    if (upward || downward) {
+                        const anchor = upward ? minIndex : maxIndex;
+                        const target = angles[anchor] + (upward ? 360 : -360);
+                        const change = angles[i] - angles[i - 1];
+                        if (change === 0) continue;
+                        const fraction = (target - angles[i - 1]) / change;
+                        const endTime = times[i - 1] + Math.max(0, Math.min(1, fraction)) * (times[i] - times[i - 1]);
+                        const period = endTime - times[anchor];
+                        if (period > 0) return period;
                     }
-
-                    if (motionStartIndex === -1) return null; // No more motion found
-
-                    // 2. Check if this motion looks valid (not just noise)
-                    const sampleEndIndex = Math.min(motionStartIndex + 20, unwrappedAngles.length - 1);
-                    const angleChange = unwrappedAngles[sampleEndIndex] - unwrappedAngles[motionStartIndex];
-
-                    // If movement is too slow or just noise, skip and try again
-                    if (Math.abs(angleChange) < 5) {
-                        currentIndex = motionStartIndex;
-                        continue;
-                    }
-
-                    // 3. Try to find the end of a 360 degree rotation
-                    const direction = Math.sign(angleChange);
-                    const targetAngle = unwrappedAngles[motionStartIndex] + (360 * direction);
-                    let endIndex = -1;
-
-                    for (let i = motionStartIndex + 1; i < unwrappedAngles.length; i++) {
-                        if ((direction > 0 && unwrappedAngles[i] >= targetAngle) ||
-                            (direction < 0 && unwrappedAngles[i] <= targetAngle)) {
-                            endIndex = i;
-                            break;
-                        }
-                    }
-
-                    if (endIndex !== -1) {
-                        // Found a valid rotation! Calculate period.
-                        const T_start = times[motionStartIndex];
-                        const angle_before = unwrappedAngles[endIndex - 1];
-                        const angle_after = unwrappedAngles[endIndex];
-                        const time_before = times[endIndex - 1];
-                        const time_after = times[endIndex];
-
-                        if (angle_after === angle_before) return time_after - T_start;
-
-                        const fraction = (targetAngle - angle_before) / (angle_after - angle_before);
-                        const T_end = time_before + fraction * (time_after - time_before);
-                        return T_end - T_start;
-                    }
-
-                    // If we didn't find a full rotation, advance search to try finding a new start point
-                    // We advance slightly past the motion start to see if a valid rotation starts later
-                    currentIndex = motionStartIndex + 1;
+                    if (angles[i] <= angles[minIndex]) minIndex = i;
+                    if (angles[i] >= angles[maxIndex]) maxIndex = i;
                 }
-
                 return null;
             }
 
@@ -1351,11 +1416,14 @@
             const centerXLabelWide = document.getElementById('center-x-label-wide');
             const centerYLabelWide = document.getElementById('center-y-label-wide');
             const dataUnitRadiosWide = document.querySelectorAll('input[name="data-unit-wide"]');
+            const autoUnitCheckboxWide = document.getElementById('auto-unit-wide');
+            const unitDetectionNoteWide = document.getElementById('unit-detection-note-wide');
+            let selectedDataUnitWide = document.querySelector('input[name="data-unit-wide"]:checked').value;
             const unitLabels = document.querySelectorAll('.unit-label');
             const coordinateUnitNote = document.getElementById('coordinate-unit-note');
 
             let trajectoryChartWide = null;
-            let fileDataStoreWide = {};
+            let fileDataStoreWide = Object.create(null);
             let lastSampledDataWide = null;
             let lastHeatmapGridWide = null;
             let is3DTrajectoryRendered = false;
@@ -1435,26 +1503,74 @@
             });
 
             dataUnitRadiosWide.forEach(radio => radio.addEventListener('change', (e) => {
-                const selectedUnit = e.target.value;
-                unitLabels.forEach(label => label.textContent = selectedUnit);
-
-                const gridSizeInput = document.getElementById('heatmap-grid-size-wide');
-                const areaSizeInput = document.getElementById('area-size-wide');
-
-                if (selectedUnit === 'm') {
-                    gridSizeInput.value = (parseFloat(gridSizeInput.value) / 1000).toFixed(2);
-                    gridSizeInput.step = 0.1;
-                    areaSizeInput.value = (parseFloat(areaSizeInput.value) / 1000).toFixed(2);
-                    areaSizeInput.step = 0.1;
-                    coordinateUnitNote.textContent = "※ 座標は正規化せず、元データの値をそのまま使用しています。";
-                } else { // mm
-                    gridSizeInput.value = Math.round(parseFloat(gridSizeInput.value) * 1000);
-                    gridSizeInput.step = 100;
-                    areaSizeInput.value = Math.round(parseFloat(areaSizeInput.value) * 1000);
-                    areaSizeInput.step = 100;
-                    coordinateUnitNote.textContent = "※ 座標は正規化せず、元データの値をメートル単位に変換して使用しています。";
-                }
+                autoUnitCheckboxWide.checked = false;
+                setDataUnitWide(e.target.value);
+                invalidateUnitResultsWide();
+                updateWideUnitInfo();
             }));
+            autoUnitCheckboxWide.addEventListener('change', () => {
+                selectDetectedUnitWide();
+                invalidateUnitResultsWide();
+                updateWideUnitInfo();
+            });
+
+            function invalidateUnitResultsWide() {
+                if (!lastSampledDataWide) return;
+                disposeTrajectory3D();
+                if (trajectoryChartWide) { trajectoryChartWide.destroy(); trajectoryChartWide = null; }
+                lastSampledDataWide = null;
+                lastHeatmapGridWide = null;
+                is3DTrajectoryRendered = false;
+                resultsCardWide.classList.add('hidden');
+            }
+
+            function setDataUnitWide(unit) {
+                if (unit !== selectedDataUnitWide) {
+                    const ratio = unit === 'm' ? 0.001 : 1000;
+                    for (const input of [gridSizeInputWide, areaSizeInputWide, centerXInputWide, centerYInputWide]) {
+                        const value = parseFloat(input.value);
+                        if (Number.isFinite(value)) input.value = Number((value * ratio).toPrecision(12));
+                    }
+                    selectedDataUnitWide = unit;
+                }
+                dataUnitRadiosWide.forEach(radio => { radio.checked = radio.value === unit; });
+                unitLabels.forEach(label => { label.textContent = unit; });
+                gridSizeInputWide.step = unit === 'm' ? 0.1 : 100;
+                areaSizeInputWide.step = unit === 'm' ? 0.1 : 100;
+                coordinateUnitNote.textContent = '※ ファイルの単位をメートルに揃えて解析・描画しています。';
+            }
+
+            function selectDetectedUnitWide() {
+                if (!autoUnitCheckboxWide.checked) return;
+                const units = new Set(Object.values(fileDataStoreWide).map(file => file.unitDetection.unit).filter(Boolean));
+                if (units.size === 1) setDataUnitWide(units.values().next().value);
+                else if (units.size > 1) setDataUnitWide('m');
+            }
+
+            function updateWideUnitInfo() {
+                const automatic = autoUnitCheckboxWide.checked;
+                const files = Object.values(fileDataStoreWide);
+                const units = new Set(files.map(file => file.unitDetection.unit).filter(Boolean));
+                let note = automatic ? 'CSVの単位情報を優先します。情報がない場合は座標の広がりから推定します。' : `全ファイルを${selectedDataUnitWide}として解析します。`;
+                if (automatic && files.length) {
+                    note = units.size > 1
+                        ? 'm・mmが混在しています。ファイルごとに変換し、マス目・基準範囲の入力にはmを使います。'
+                        : `読み込み時に${selectedDataUnitWide}を選択しました。手動で変更することもできます。`;
+                    if (files.some(file => file.unitDetection.source === 'scale')) note += ' 座標からの推定は目安です。';
+                    if (files.some(file => !file.unitDetection.unit)) note += ` 未判定のファイルは${selectedDataUnitWide}として扱います。必要に応じて自動選択を解除してください。`;
+                }
+                unitDetectionNoteWide.textContent = note;
+                fileListAreaWide.innerHTML = Object.entries(fileDataStoreWide).map(([filename, file]) => {
+                    const detection = file.unitDetection;
+                    const unit = automatic && detection.unit ? detection.unit : selectedDataUnitWide;
+                    const source = !automatic ? '手動' : detection.source === 'header' ? 'CSV' : detection.source === 'scale' ? '推定' : '未判定';
+                    return `<div class="bg-slate-50 p-2.5 rounded-md border text-sm flex justify-between items-center gap-3">
+                        <span class="text-slate-700 truncate">${escapeHtml(filename)}</span>
+                        <span class="text-xs text-slate-500 whitespace-nowrap">${source}: ${unit}</span>
+                    </div>`;
+                }).join('');
+            }
+            updateWideUnitInfo();
 
             function handleFileSelectWide(event) {
                 const files = Array.from(event.target.files);
@@ -1469,13 +1585,14 @@
                         return Promise.resolve();
                     }
                     return new Promise((resolve, reject) => {
-                        Papa.parse(file, {
+                        MocapCsv.parse(file, {
                             complete: (results) => {
                                 try {
                                     const { rigidBodyInfo, rawData: processedData } = parseHeaderWide(results.data);
                                     fileDataStoreWide[file.name] = {
                                         rawData: processedData,
-                                        rigidBodyInfo: rigidBodyInfo
+                                        rigidBodyInfo: rigidBodyInfo,
+                                        unitDetection: MocapCsv.detectLengthUnit(results.data)
                                     };
                                     resolve();
                                 } catch (error) {
@@ -1489,6 +1606,7 @@
 
                 Promise.all(filePromises)
                     .then(() => {
+                        selectDetectedUnitWide();
                         updateFileAndRigidBodyUIWide();
                         analyzeBtnWide.disabled = false;
                     })
@@ -1524,8 +1642,8 @@
                 const dataHeaderRow = data[dataHeaderRowIndex];
                 const dataStartIndex = dataHeaderRowIndex + 1;
 
-                let rigidBodyInfo = {};
-                let nameCounts = {};
+                let rigidBodyInfo = Object.create(null);
+                let nameCounts = Object.create(null);
 
                 for (let i = 2; i < typeRow.length; i++) {
                     if (typeRow[i] === 'Rigid Body' && propertyRow[i] === 'Position') {
@@ -1571,28 +1689,24 @@
             }
 
             function updateFileAndRigidBodyUIWide() {
-                fileListAreaWide.innerHTML = Object.keys(fileDataStoreWide).map(filename =>
-                    `<div class="bg-slate-50 p-2.5 rounded-md border text-sm flex justify-between items-center">
-                        <span class="text-slate-700 truncate pr-4">${filename}</span>
-                    </div>`
-                ).join('');
+                updateWideUnitInfo();
 
                 rigidbodyListContainerWide.innerHTML = Object.keys(fileDataStoreWide).map(filename => {
                     const info = fileDataStoreWide[filename];
                     if (Object.keys(info.rigidBodyInfo).length === 0) return '';
                     return `
                         <div>
-                            <h4 class="font-semibold text-sm text-slate-800 mb-2 border-b pb-1">${filename}</h4>
+                            <h4 class="font-semibold text-sm text-slate-800 mb-2 border-b pb-1">${escapeHtml(filename)}</h4>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
                                 ${Object.keys(info.rigidBodyInfo).map(name => `
                                     <div class="rigidbody-item-container-wide">
                                         <label class="flex items-center space-x-2 p-2 rounded-md hover:bg-slate-100 cursor-pointer w-full">
-                                            <input type="checkbox" class="rigidbody-checkbox-wide form-checkbox h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" data-filename="${filename}" value="${name}" checked>
-                                            <span class="text-slate-800 text-sm">${name}</span>
+                                            <input type="checkbox" class="rigidbody-checkbox-wide form-checkbox h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" data-filename="${escapeHtml(filename)}" value="${escapeHtml(name)}" checked>
+                                            <span class="text-slate-800 text-sm">${escapeHtml(name)}</span>
                                         </label>
                                         <div class="legend-input-container-wide pl-7 mt-1 hidden">
                                             <label class="text-xs text-slate-500">凡例名:</label>
-                                            <input type="text" class="legend-label-input-wide mt-1 block w-full rounded-md shadow-sm p-1.5 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500" data-filename="${filename}" data-bodyname="${name}" value="${filename} - ${name}">
+                                            <input type="text" class="legend-label-input-wide mt-1 block w-full rounded-md shadow-sm p-1.5 text-sm border-slate-300 focus:ring-1 focus:ring-blue-500" data-filename="${escapeHtml(filename)}" data-bodyname="${escapeHtml(name)}" value="${escapeHtml(filename)} - ${escapeHtml(name)}">
                                         </div>
                                     </div>
                                 `).join('')}
@@ -1625,7 +1739,12 @@
             }
 
             function clearAllFilesWide() {
-                fileDataStoreWide = {};
+                disposeTrajectory3D();
+                lastSampledDataWide = null;
+                lastHeatmapGridWide = null;
+                is3DTrajectoryRendered = false;
+                if (trajectoryChartWide) { trajectoryChartWide.destroy(); trajectoryChartWide = null; }
+                fileDataStoreWide = Object.create(null);
                 csvFileInputWide.value = '';
                 updateFileAndRigidBodyUIWide();
                 resultsCardWide.classList.add('hidden');
@@ -1638,7 +1757,7 @@
                 const selectedBodies = Array.from(document.querySelectorAll('.rigidbody-checkbox-wide:checked')).map(cb => {
                     const filename = cb.dataset.filename;
                     const bodyName = cb.value;
-                    const legendInput = document.querySelector(`.legend-label-input-wide[data-filename="${filename}"][data-bodyname="${bodyName}"]`);
+                    const legendInput = findNamedInput('.legend-label-input-wide', filename, bodyName);
                     return {
                         filename: filename,
                         bodyName: bodyName,
@@ -1654,14 +1773,14 @@
 
                 if (samplingMode === 'seconds') {
                     samplingValue = parseFloat(samplingRateInputWide.value);
-                    if (isNaN(samplingValue) || samplingValue <= 0) { alert('データ取得間隔(秒)には正の数値を入力してください。'); return; }
+                    if (!Number.isFinite(samplingValue) || samplingValue <= 0) { alert('データ取得間隔(秒)には正の数値を入力してください。'); return; }
                 } else if (samplingMode === 'frames') {
                     samplingValue = parseInt(samplingFramesInputWide.value, 10);
                     if (isNaN(samplingValue) || samplingValue < 1) { alert('データ取得間隔(フレーム)には1以上の整数を入力してください。'); return; }
                 }
 
                 let gridSize = parseFloat(gridSizeInputWide.value);
-                if (isNaN(gridSize) || gridSize <= 0) { alert('マス目のサイズには正の数値を入力してください。'); return; }
+                if (!Number.isFinite(gridSize) || gridSize <= 0) { alert('マス目のサイズには正の数値を入力してください。'); return; }
 
                 if (dataUnit === 'mm') {
                     gridSize /= 1000;
@@ -1680,6 +1799,7 @@
 
                 loadingDiv.classList.remove('hidden');
                 loadingText.textContent = "解析中...";
+                disposeTrajectory3D();
                 is3DTrajectoryRendered = false; // Reset render flag
 
                 setTimeout(() => {
@@ -1690,7 +1810,7 @@
                         const hAxis2 = horizontalAxes[1];
 
                         const samplingParams = { mode: samplingMode, value: samplingValue };
-                        lastSampledDataWide = sampleAllDataWide(selectedBodies, samplingParams, dataUnit, invertZ);
+                        lastSampledDataWide = sampleAllDataWide(selectedBodies, samplingParams, dataUnit, invertZ, autoUnitCheckboxWide.checked);
                         drawTrajectoryWide(lastSampledDataWide, hAxis1, hAxis2);
                         // Defer 3D trajectory drawing until the tab is clicked
                         // draw3DTrajectory(lastSampledDataWide);
@@ -1709,7 +1829,7 @@
                         }
 
                         centerXLabelWide.textContent = `${hAxis1}:`;
-                        centerYLabelWide.textContent = `${hAxis2}:`;
+                        centerYLabelWide.textContent = `−${hAxis2}:`;
 
                         resultsCardWide.classList.remove('hidden');
                         switchViewWide('trajectory');
@@ -1722,12 +1842,15 @@
                 }, 50);
             }
 
-            function sampleAllDataWide(selectedBodies, samplingParams, dataUnit, invertZ) {
-                const result = {};
+            function sampleAllDataWide(selectedBodies, samplingParams, dataUnit, invertZ, automaticUnits = false) {
+                const result = Object.create(null);
                 selectedBodies.forEach(({ filename, bodyName, label }) => {
-                    const uniqueKey = label;
+                    let uniqueKey = label;
+                    let duplicate = 2;
+                    while (Object.hasOwn(result, uniqueKey)) uniqueKey = `${label} (${duplicate++})`;
                     result[uniqueKey] = [];
-                    const { rawData, rigidBodyInfo } = fileDataStoreWide[filename];
+                    const { rawData, rigidBodyInfo, unitDetection } = fileDataStoreWide[filename];
+                    const sourceUnit = automaticUnits && unitDetection && unitDetection.unit ? unitDetection.unit : dataUnit;
                     const info = rigidBodyInfo[bodyName];
                     if (!info) return;
 
@@ -1739,7 +1862,7 @@
                     for (let i = 0; i < rawData.length; i++) {
                         const row = rawData[i];
                         const time = parseFloat(row[1]);
-                        if (isNaN(time)) continue;
+                        if (!Number.isFinite(time)) continue;
 
                         let shouldSample = false;
                         if (mode === 'none') {
@@ -1749,9 +1872,9 @@
                             // Actually rawData is sliced. i is 0-based index.
                             shouldSample = (i % val === 0);
                         } else { // seconds
-                            if (time >= nextSampleTime) {
+                            if (time + 1e-9 >= nextSampleTime) {
                                 shouldSample = true;
-                                nextSampleTime += val;
+                                nextSampleTime = time + val;
                             }
                         }
 
@@ -1760,7 +1883,7 @@
                             let y = parseFloat(row[info.yIndex]);
                             let z = parseFloat(row[info.zIndex]);
 
-                            if (dataUnit === 'mm') {
+                            if (sourceUnit === 'mm') {
                                 x /= 1000;
                                 y /= 1000;
                                 z /= 1000;
@@ -1770,7 +1893,7 @@
                                 z = -z;
                             }
 
-                            if (!isNaN(x) && !isNaN(y) && !isNaN(z)) {
+                            if (Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(z)) {
                                 result[uniqueKey].push({ t: time, x: x, y: y, z: z });
                             }
                         }
@@ -1923,9 +2046,7 @@
                 const allPoints = [].concat(...datasets.map(d => d.data));
                 let scales = {};
                 if (allPoints.length > 0) {
-                    const allX = allPoints.map(p => p.x), allY = allPoints.map(p => p.y);
-                    const minX = Math.min(...allX), maxX = Math.max(...allX);
-                    const minY = Math.min(...allY), maxY = Math.max(...allY);
+                    const { minX, maxX, minY, maxY } = pointBounds(allPoints, p => p.x, p => p.y);
                     const rangeX = maxX - minX, rangeY = maxY - minY;
                     const maxRange = Math.max(rangeX, rangeY, 0.1) * 1.1;
                     const midX = (minX + maxX) / 2, midY = (minY + maxY) / 2;
@@ -1942,6 +2063,7 @@
             function draw3DTrajectory(data) {
                 const container = document.getElementById('trajectory-3d-container-wide');
                 if (!container) return;
+                disposeTrajectory3D();
                 container.innerHTML = '';
 
                 const scene = new THREE.Scene();
@@ -1965,22 +2087,32 @@
 
                 const colors = ['#3b82f6', '#ef4444', '#10b981', '#f97316', '#8b5cf6', '#f59e0b', '#14b8a6', '#ec4899', '#6929c4', '#1192e8', '#005d5d', '#9f1853', '#fa4d56', '#570408', '#198038', '#002d9c', '#ee538b', '#b28600', '#009d9a', '#012749'];
 
-                const allPoints = [].concat(...Object.values(data).map(arr => arr.map(p => new THREE.Vector3(p.x, p.y, p.z))));
+                const allPoints = Object.values(data).flat();
+                // Select one drawing method for the whole view. Per-body switching
+                // made short tracks thick tubes next to long, thin line tracks.
+                const useLineTrajectories = allPoints.length > 5000;
 
                 if (allPoints.length > 1) {
                     Object.values(data).forEach((pointsData, index) => {
                         const points = pointsData.map(p => new THREE.Vector3(p.x, p.y, p.z));
                         if (points.length < 2) return;
 
-                        const curve = new THREE.CatmullRomCurve3(points);
-                        const tubeGeometry = new THREE.TubeGeometry(curve, points.length * 2, 0.05, 8, false);
-                        const tubeMaterial = new THREE.MeshStandardMaterial({
-                            color: colors[index % colors.length],
-                            metalness: 0.5,
-                            roughness: 0.5
-                        });
-                        const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
-                        scene.add(tube);
+                        if (useLineTrajectories) {
+                            // Keep every trajectory vertex without generating a
+                            // many-sided tube around hundreds of thousands of points.
+                            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                            const material = new THREE.LineBasicMaterial({ color: colors[index % colors.length] });
+                            scene.add(new THREE.Line(geometry, material));
+                        } else {
+                            const curve = new THREE.CatmullRomCurve3(points);
+                            const tubeGeometry = new THREE.TubeGeometry(curve, points.length * 2, 0.05, 8, false);
+                            const tubeMaterial = new THREE.MeshStandardMaterial({
+                                color: colors[index % colors.length],
+                                metalness: 0.5,
+                                roughness: 0.5
+                            });
+                            scene.add(new THREE.Mesh(tubeGeometry, tubeMaterial));
+                        }
                     });
 
                     const boundingBox = new THREE.Box3().setFromPoints(allPoints);
@@ -1989,7 +2121,7 @@
                     const size = new THREE.Vector3();
                     boundingBox.getSize(size);
 
-                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const maxDim = Math.max(size.x, size.y, size.z, 0.1);
                     const fov = camera.fov * (Math.PI / 180);
                     const cameraDistance = Math.abs(maxDim / (2 * Math.tan(fov / 2)));
 
@@ -2014,22 +2146,57 @@
                     scene.add(gridHelper);
                 }
 
+                let animationId = null;
+                let running = false;
                 function animate() {
-                    requestAnimationFrame(animate);
+                    animationId = null;
+                    if (!running) return;
                     controls.update();
                     renderer.render(scene, camera);
+                    animationId = requestAnimationFrame(animate);
                 }
-                animate();
 
                 const resizeObserver = new ResizeObserver(entries => {
                     if (entries.length === 0) return;
                     const { width, height } = entries[0].contentRect;
+                    if (width <= 0 || height <= 0) return;
                     camera.aspect = width / height;
                     camera.updateProjectionMatrix();
                     renderer.setSize(width, height);
                 });
 
                 resizeObserver.observe(container);
+                trajectory3DSession = {
+                    start() {
+                        if (running) return;
+                        running = true;
+                        if (container.clientWidth > 0 && container.clientHeight > 0) {
+                            camera.aspect = container.clientWidth / container.clientHeight;
+                            camera.updateProjectionMatrix();
+                            renderer.setSize(container.clientWidth, container.clientHeight);
+                        }
+                        animationId = requestAnimationFrame(animate);
+                    },
+                    stop() {
+                        running = false;
+                        if (animationId !== null) cancelAnimationFrame(animationId);
+                        animationId = null;
+                    },
+                    destroy() {
+                        this.stop();
+                        resizeObserver.disconnect();
+                        controls.dispose();
+                        scene.traverse(object => {
+                            if (object.geometry) object.geometry.dispose();
+                            if (object.material) {
+                                for (const material of (Array.isArray(object.material) ? object.material : [object.material])) material.dispose();
+                            }
+                        });
+                        renderer.dispose();
+                        if (renderer.domElement.parentNode === container) container.removeChild(renderer.domElement);
+                    }
+                };
+                syncTrajectoryVisibility();
             }
 
             function calculateHeatmapGridWide(data, gridSize, hAxis1, hAxis2) {
@@ -2038,38 +2205,38 @@
                 const allPoints = [].concat(...Object.values(data));
                 if (allPoints.length === 0) return { grid: [], maxCount: 0, gridInfo: null };
 
-                const minX = Math.min(...allPoints.map(p => p[hAxis1Lower])), maxX = Math.max(...allPoints.map(p => p[hAxis1Lower]));
-                const minY = Math.min(...allPoints.map(p => -p[hAxis2Lower])), maxY = Math.max(...allPoints.map(p => -p[hAxis2Lower]));
+                const { minX, maxX, minY, maxY } = pointBounds(allPoints, p => p[hAxis1Lower], p => -p[hAxis2Lower]);
                 const rangeX = maxX - minX, rangeY = maxY - minY;
                 const maxRange = Math.max(rangeX, rangeY, 0.1);
                 const midX = (minX + maxX) / 2, midY = (minY + maxY) / 2;
                 const gridMinX = midX - maxRange / 2, gridMinY = midY - maxRange / 2;
                 const divisions = Math.ceil(maxRange / gridSize);
                 const cols = Math.max(1, divisions), rows = Math.max(1, divisions);
+                if (!Number.isFinite(divisions) || rows * cols > 1000000) {
+                    throw new Error('ヒートマップのセル数が多すぎます。グリッドサイズを大きくして100万セル以下にしてください。');
+                }
 
                 const grid = Array(rows).fill(0).map(() => Array(cols).fill(0));
-                const timeSteps = {};
-                const samplingRate = parseFloat(samplingRateInputWide.value);
-                allPoints.forEach(p => {
-                    const t = Math.floor(p.t / samplingRate);
-                    if (!timeSteps[t]) timeSteps[t] = [];
-                    timeSteps[t].push(p);
-                });
-                Object.values(timeSteps).forEach(pointsInStep => {
-                    const visitedCells = new Set();
-                    pointsInStep.forEach(point => {
-                        const col = Math.floor((point[hAxis1Lower] - gridMinX) / gridSize);
-                        const row = Math.floor((-point[hAxis2Lower] - gridMinY) / gridSize);
-                        if (col >= 0 && col < cols && row >= 0 && row < rows) {
-                            visitedCells.add(`${row}-${col}`);
-                        }
-                    });
-                    visitedCells.forEach(cell => {
-                        const [r, c] = cell.split('-').map(Number);
-                        if (grid[r] !== undefined && grid[r][c] !== undefined) grid[r][c]++;
-                    });
-                });
-                const maxCount = Math.max(0, ...[].concat(...grid));
+                let maxCount = 0;
+                // Count distinct sampled timestamps, including in frame/none
+                // modes. A hidden seconds input must not change the result.
+                allPoints.sort((a, b) => a.t - b.t);
+                let currentTime;
+                const visitedCells = new Set();
+                for (const point of allPoints) {
+                    if (point.t !== currentTime) { visitedCells.clear(); currentTime = point.t; }
+                    const x = (point[hAxis1Lower] - gridMinX) / gridSize;
+                    const y = (-point[hAxis2Lower] - gridMinY) / gridSize;
+                    // Include the outer maximum boundary in the final cell.
+                    const c = Math.min(cols - 1, Math.floor(x));
+                    const r = Math.min(rows - 1, Math.floor(y));
+                    if (c < 0 || r < 0 || x > cols + 1e-9 || y > rows + 1e-9) continue;
+                    const cell = r * cols + c;
+                    if (visitedCells.has(cell)) continue;
+                    visitedCells.add(cell);
+                    grid[r][c]++;
+                    if (grid[r][c] > maxCount) maxCount = grid[r][c];
+                }
                 const gridInfo = { gridMinX, gridMinY, rows, cols, gridSize };
                 return { grid, maxCount, gridInfo };
             }
@@ -2128,6 +2295,7 @@
                 showTrajectoryBtnWide.classList.remove('active');
                 showHeatmapBtnWide.classList.remove('active');
                 show3DTrajectoryBtnWide.classList.remove('active');
+                syncTrajectoryVisibility();
 
                 if (viewName === 'trajectory') {
                     trajectoryViewWide.classList.remove('hidden');
@@ -2150,18 +2318,59 @@
                     show3DTrajectoryBtnWide.classList.add('active');
                     if (lastSampledDataWide && !is3DTrajectoryRendered) {
                         setTimeout(() => { // Use setTimeout to ensure the container is fully visible
+                            if (!lastSampledDataWide || is3DTrajectoryRendered || trajectory3DViewWide.classList.contains('hidden')) return;
                             draw3DTrajectory(lastSampledDataWide);
                             is3DTrajectoryRendered = true;
                         }, 50);
                     }
                 }
+                syncTrajectoryVisibility();
             }
 
             function calculateDataCenterWide(allPoints) {
                 if (allPoints.length === 0) return { x: 0, y: 0 };
-                const sumX = allPoints.reduce((sum, p) => sum + p.x, 0);
-                const sumY = allPoints.reduce((sum, p) => sum + p.y, 0);
+                const axes = ['X', 'Y', 'Z'].filter(axis => axis !== verticalAxisSelectWide.value);
+                const sumX = allPoints.reduce((sum, p) => sum + p[axes[0].toLowerCase()], 0);
+                const sumY = allPoints.reduce((sum, p) => sum - p[axes[1].toLowerCase()], 0);
                 return { x: sumX / allPoints.length, y: sumY / allPoints.length };
+            }
+
+            function calculateCoverageWide(grid, gridInfo, shape, size, centerX, centerY) {
+                const { gridMinX, gridMinY, rows, cols, gridSize } = gridInfo;
+                const originX = gridMinX + gridSize / 2, originY = gridMinY + gridSize / 2;
+                const half = shape === 'circle' ? size : size / 2;
+                const firstRow = Math.ceil((centerY - half - originY) / gridSize - 1e-9);
+                const lastRow = Math.floor((centerY + half - originY) / gridSize + 1e-9);
+                let totalCells = 0;
+                if (shape === 'square') {
+                    const firstCol = Math.ceil((centerX - half - originX) / gridSize - 1e-9);
+                    const lastCol = Math.floor((centerX + half - originX) / gridSize + 1e-9);
+                    totalCells = Math.max(0, lastCol - firstCol + 1) * Math.max(0, lastRow - firstRow + 1);
+                } else {
+                    if (lastRow - firstRow > 2000000) throw new Error('基準範囲に対してグリッドが細かすぎます。マス目を大きくしてください。');
+                    // Count one row at a time across the entire reference area.
+                    // Empty cells outside the trajectory grid need no allocation.
+                    for (let r = firstRow; r <= lastRow; r++) {
+                        const dy = originY + r * gridSize - centerY;
+                        const width = Math.sqrt(Math.max(0, size * size - dy * dy));
+                        const firstCol = Math.ceil((centerX - width - originX) / gridSize - 1e-9);
+                        const lastCol = Math.floor((centerX + width - originX) / gridSize + 1e-9);
+                        totalCells += Math.max(0, lastCol - firstCol + 1);
+                    }
+                }
+                let reachedCells = 0;
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        if (grid[r][c] <= 0) continue;
+                        const dx = originX + c * gridSize - centerX;
+                        const dy = originY + r * gridSize - centerY;
+                        const inside = shape === 'circle'
+                            ? dx * dx + dy * dy <= size * size + gridSize * gridSize * 1e-9
+                            : Math.abs(dx) <= half + gridSize * 1e-9 && Math.abs(dy) <= half + gridSize * 1e-9;
+                        if (inside) reachedCells++;
+                    }
+                }
+                return { totalCells, reachedCells, coverage: totalCells ? reachedCells / totalCells * 100 : 0 };
             }
 
             function calculateAndDisplayCoverageWide() {
@@ -2173,7 +2382,7 @@
                 const shape = document.querySelector('input[name="area-shape-wide"]:checked').value;
                 const dataUnit = document.querySelector('input[name="data-unit-wide"]:checked').value;
                 let size = parseFloat(areaSizeInputWide.value);
-                if (isNaN(size) || size <= 0) {
+                if (!Number.isFinite(size) || size <= 0) {
                     alert('基準範囲のサイズには正の数値を入力してください。');
                     return;
                 }
@@ -2182,7 +2391,7 @@
                 if (document.querySelector('input[name="center-type-wide"]:checked').value === 'custom') {
                     centerX = parseFloat(centerXInputWide.value);
                     centerY = parseFloat(centerYInputWide.value);
-                    if (isNaN(centerX) || isNaN(centerY)) {
+                    if (!Number.isFinite(centerX) || !Number.isFinite(centerY)) {
                         alert('中心座標には有効な数値を入力してください。');
                         return;
                     }
@@ -2204,38 +2413,9 @@
                 const { grid, gridInfo } = lastHeatmapGridWide;
                 const { gridMinX, gridMinY, rows, cols, gridSize } = gridInfo;
 
-                let totalCellsInArea = 0;
-                let reachedCellsInArea = 0;
-
-                for (let r = 0; r < rows; r++) {
-                    for (let c = 0; c < cols; c++) {
-                        const cellCenterX = gridMinX + (c + 0.5) * gridSize;
-                        const cellCenterY = gridMinY + (r + 0.5) * gridSize;
-
-                        const dx = cellCenterX - centerX;
-                        const dy = cellCenterY - centerY;
-
-                        let isInArea = false;
-                        if (shape === 'circle') {
-                            if ((dx * dx + dy * dy) <= (size * size)) {
-                                isInArea = true;
-                            }
-                        } else { // square
-                            if (Math.abs(dx) <= size / 2 && Math.abs(dy) <= size / 2) {
-                                isInArea = true;
-                            }
-                        }
-
-                        if (isInArea) {
-                            totalCellsInArea++;
-                            if (grid[r][c] > 0) {
-                                reachedCellsInArea++;
-                            }
-                        }
-                    }
-                }
-
-                const coverage = totalCellsInArea > 0 ? (reachedCellsInArea / totalCellsInArea) * 100 : 0;
+                let coverage;
+                try { ({ coverage } = calculateCoverageWide(grid, gridInfo, shape, size, centerX, centerY)); }
+                catch (error) { alert(error.message); return; }
                 coverageResultElWide.textContent = coverage.toFixed(2);
 
                 // Visualize the area on the heatmap
@@ -2258,13 +2438,15 @@
                     ctx.setLineDash([5, 5]);
 
                     if (shape === 'circle') {
-                        const canvasRadius = (size / totalGridWidth) * canvasWidth;
+                        const canvasRadiusX = (size / totalGridWidth) * canvasWidth;
+                        const canvasRadiusY = (size / totalGridHeight) * canvasHeight;
                         ctx.beginPath();
-                        ctx.arc(canvasCenterX, canvasCenterY, canvasRadius, 0, 2 * Math.PI);
+                        ctx.ellipse(canvasCenterX, canvasCenterY, canvasRadiusX, canvasRadiusY, 0, 0, 2 * Math.PI);
                         ctx.stroke();
                     } else {
-                        const canvasSide = (size / totalGridWidth) * canvasWidth;
-                        ctx.strokeRect(canvasCenterX - canvasSide / 2, canvasCenterY - canvasSide / 2, canvasSide, canvasSide);
+                        const canvasSideX = (size / totalGridWidth) * canvasWidth;
+                        const canvasSideY = (size / totalGridHeight) * canvasHeight;
+                        ctx.strokeRect(canvasCenterX - canvasSideX / 2, canvasCenterY - canvasSideY / 2, canvasSideX, canvasSideY);
                     }
                     ctx.setLineDash([]);
                 }, 100);
@@ -2332,16 +2514,23 @@
                 });
             }
 
+            let parseVersionDistance = 0;
+
             function handleFileSelectDistance(event) {
                 const file = event.target.files[0];
                 if (!file) return;
+                const version = ++parseVersionDistance;
+                fileDataStoreDistance = null;
+                pairSelectionArea.classList.add('hidden');
 
                 fileNameDistance.textContent = file.name;
                 loadingDiv.classList.remove('hidden');
                 loadingText.textContent = "ファイルを読み込み中...";
 
-                Papa.parse(file, {
+                MocapCsv.parse(file, {
+                    mode: 'distance',
                     complete: (results) => {
+                        if (version !== parseVersionDistance) return;
                         try {
                             fileDataStoreDistance = parseHeaderDistance(results.data);
                             pairSelectionArea.classList.remove('hidden');
@@ -2357,6 +2546,7 @@
                         }
                     },
                     error: (error) => {
+                        if (version !== parseVersionDistance) return;
                         alert(`ファイルの読み込みに失敗しました: ${error.message}`);
                         loadingDiv.classList.add('hidden');
                     }
@@ -2388,70 +2578,10 @@
                 const dataHeaderRow = data[dataHeaderRowIndex];
                 const dataStartIndex = dataHeaderRowIndex + 1;
 
-                const objects = {
-                    rigidBodies: [],
-                    markers: []
-                };
-
-                for (let i = 2; i < typeRow.length; i++) {
-                    // Check for Position property
-                    if (propertyRow[i] !== 'Position') continue;
-
-                    const type = typeRow[i];
-                    const name = nameRow[i];
-
-                    // Identify object end index (assuming X, Y, Z are contiguous)
-                    // Check if we have X, Y, Z
-                    let xIndex = -1, yIndex = -1, zIndex = -1;
-
-                    for (let j = 0; j < 3; j++) {
-                        if (i + j < dataHeaderRow.length) {
-                            const axis = dataHeaderRow[i + j].toUpperCase();
-                            if (axis === 'X') xIndex = i + j;
-                            if (axis === 'Y') yIndex = i + j;
-                            if (axis === 'Z') zIndex = i + j;
-                        }
-                    }
-
-                    if (xIndex !== -1 && yIndex !== -1 && zIndex !== -1) {
-                        const objData = { name: name, xIndex, yIndex, zIndex };
-                        if (type === 'Rigid Body') {
-                            if (!objects.rigidBodies.find(o => o.name === name)) {
-                                objects.rigidBodies.push(objData);
-                            }
-                        } else if (type === 'Marker') {
-                            // Try to find if this marker belongs to a rigid body.
-                            // Motive sometimes puts "RigidBodyName:MarkerName" in the Name row, or puts RigidBody name in a separate row if exported differently.
-                            // Based on standard motive export (CSV), Name row usually contains the full unique name.
-                            // However, sometimes it's grouped.
-                            // Let's assume the name in 'Name' row is unique enough or formatted as "RB:Marker".
-                            // The user requested: "マーカー一覧では，マーカー名の前に剛体名を入れることにしてください"
-                            // If the CSV structure has a specific row for ID or Rigid Body Parent, we might use it.
-                            // But standard "Take" export usually flattens it or puts it in Name.
-                            // Let's use the Name column as is, assuming it contains necessary info,
-                            // OR check if there's a convention.
-
-                            // If the name is just "Marker1" and it belongs to "Robot", often it's "Robot:Marker1".
-                            // We will just store it. If we can deduce a prefix from previous columns or similar, we might.
-                            // But parsing strictly from columns:
-
-                            if (!objects.markers.find(o => o.name === name)) {
-                                objects.markers.push(objData);
-                            }
-                        }
-                        // Advance index to skip Y and Z
-                        // Note: The loop increments by 1, so we don't need to skip manually if we just process when propertyRow[i] is 'Position' (usually aligned with X).
-                        // Actually, propertyRow usually has 'Position' for X, Y, Z columns or just one merged cell?
-                        // In CSV, usually: Type, Type, Type... | Name, Name, Name... | Position, Position, Position... | X, Y, Z, X, Y, Z...
-                        // So propertyRow[i] is 'Position' for X, Y, and Z.
-                        // We should process only if we are at X (start of triplet).
-                        // We can detect if dataHeaderRow[i] is 'X'.
-
-                    }
-                }
-
                 // Refined loop to ensure we only pick up the start of a triplet
                 const uniqueObjects = { rigidBodies: [], markers: [] };
+                const bodyNameCounts = Object.create(null);
+                const markerNameCounts = Object.create(null);
                 for (let i = 2; i < typeRow.length; i++) {
                     if (propertyRow[i] === 'Position' && dataHeaderRow[i].toUpperCase() === 'X') {
                         const type = typeRow[i];
@@ -2466,9 +2596,13 @@
 
                             const obj = { name, xIndex, yIndex, zIndex };
                             if (type === 'Rigid Body') {
-                                if (!uniqueObjects.rigidBodies.find(o => o.name === name)) uniqueObjects.rigidBodies.push(obj);
-                            } else if (type === 'Marker') {
-                                if (!uniqueObjects.markers.find(o => o.name === name)) uniqueObjects.markers.push(obj);
+                                const count = bodyNameCounts[name] = (bodyNameCounts[name] || 0) + 1;
+                                if (count > 1) obj.name += ` (${count})`;
+                                uniqueObjects.rigidBodies.push(obj);
+                            } else if (type === 'Marker' || type === 'Rigid Body Marker') {
+                                const count = markerNameCounts[name] = (markerNameCounts[name] || 0) + 1;
+                                if (count > 1) obj.name += ` (${count})`;
+                                uniqueObjects.markers.push(obj);
                             }
                         }
                     }
@@ -2589,14 +2723,19 @@
 
                 setTimeout(() => {
                     try {
+                        const averages = new Map();
+                        const average = object => {
+                            if (!averages.has(object)) averages.set(object, calculateAveragePosition(object, samplingRate, isDownsampling, dataUnit));
+                            return averages.get(object);
+                        };
                         const results = pairs.map(pair => {
                             const objA = objectList.find(o => o.name === pair.a);
                             const objB = objectList.find(o => o.name === pair.b);
 
                             if (!objA || !objB) return null;
 
-                            const avgA = calculateAveragePosition(objA, samplingRate, isDownsampling, dataUnit);
-                            const avgB = calculateAveragePosition(objB, samplingRate, isDownsampling, dataUnit);
+                            const avgA = average(objA);
+                            const avgB = average(objB);
 
                             // Euclidean distance between averages
                             const distance = Math.sqrt(
@@ -2612,7 +2751,7 @@
 
                     } catch (e) {
                         console.error(e);
-                        alert("計算中にエラーが発生しました。");
+                        alert(`計算中にエラーが発生しました: ${e.message}`);
                     } finally {
                         loadingDiv.classList.add('hidden');
                     }
@@ -2627,14 +2766,14 @@
 
                 for (const row of rawData) {
                     const time = parseFloat(row[1]);
-                    if (isNaN(time)) continue;
+                    if (!Number.isFinite(time)) continue;
 
-                    if (!isDownsampling || time >= nextSampleTime) {
+                    if (!isDownsampling || time + 1e-9 >= nextSampleTime) {
                         let x = parseFloat(row[objInfo.xIndex]);
                         let y = parseFloat(row[objInfo.yIndex]);
                         let z = parseFloat(row[objInfo.zIndex]);
 
-                        if (!isNaN(x) && !isNaN(y) && !isNaN(z)) {
+                        if (Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(z)) {
                             if (dataUnit === 'mm') {
                                 x /= 1000;
                                 y /= 1000;
@@ -2646,13 +2785,12 @@
                             count++;
                         }
                         if (isDownsampling) {
-                            if (nextSampleTime === -1) nextSampleTime = time; // Initialize on first valid frame
-                            nextSampleTime += samplingRate;
+                            nextSampleTime = time + samplingRate;
                         }
                     }
                 }
 
-                if (count === 0) return { x: 0, y: 0, z: 0 };
+                if (count === 0) throw new Error(`${objInfo.name} に有効な座標データがありません。`);
                 return { x: sumX / count, y: sumY / count, z: sumZ / count };
             }
 
@@ -2662,7 +2800,7 @@
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
-                            ${res.pair.a} <span class="text-slate-400 mx-1">↔</span> ${res.pair.b}
+                            ${escapeHtml(res.pair.a)} <span class="text-slate-400 mx-1">↔</span> ${escapeHtml(res.pair.b)}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 font-bold">
                             ${res.distance.toFixed(4)}
@@ -2728,18 +2866,25 @@
                 });
             }
 
+            let parseVersionTrimming = 0;
+
             function handleFileSelectTrimming(event) {
                 const file = event.target.files[0];
                 if (!file) return;
+                const version = ++parseVersionTrimming;
+                trimmingData = null;
+                trimmingUI.classList.add('hidden');
 
                 fileNameTrimming.textContent = file.name;
                 loadingDiv.classList.remove('hidden');
                 loadingText.textContent = "ファイルを読み込み中...";
 
-                Papa.parse(file, {
+                MocapCsv.parse(file, {
                     complete: (results) => {
+                        if (version !== parseVersionTrimming) return;
                         try {
                             trimmingData = parseHeaderTrimming(results.data);
+                            trimmingData.file = file;
                             setupTrimmingUI();
                         } catch (error) {
                             alert(`解析エラー: ${error.message}`);
@@ -2748,6 +2893,7 @@
                         }
                     },
                     error: (error) => {
+                        if (version !== parseVersionTrimming) return;
                         alert(`ファイルの読み込みに失敗しました: ${error.message}`);
                         loadingDiv.classList.add('hidden');
                     }
@@ -2777,8 +2923,8 @@
                 }
 
                 const rigidBodies = [];
-                const nameCounts = {};
-                const parsedBodyData = {};
+                const nameCounts = Object.create(null);
+                const parsedBodyData = Object.create(null);
 
                 // We need to find Position X, Y, Z for each rigid body
                 let propertyRowIndex = -1;
@@ -2861,13 +3007,13 @@
                 }
 
                 // Count totals
-                const totalCounts = {};
+                const totalCounts = Object.create(null);
                 tempBodyLocations.forEach(loc => {
                     totalCounts[loc.rawName] = (totalCounts[loc.rawName] || 0) + 1;
                 });
 
                 // Assign unique names
-                const currentCounts = {};
+                const currentCounts = Object.create(null);
                 tempBodyLocations.forEach(loc => {
                     const rawName = loc.rawName;
                     let uniqueName = rawName;
@@ -3212,74 +3358,34 @@
                 });
             }
 
-            function exportTrimmedData() {
+            async function exportTrimmedData() {
                 if (!trimmingData) return;
 
                 const start = parseFloat(trimStartTimeInput.value);
                 const end = parseFloat(trimEndTimeInput.value);
 
-                if (start >= end) {
+                if (!Number.isFinite(start) || !Number.isFinite(end) || start >= end) {
                     alert('開始時間は終了時間より前である必要があります。');
                     return;
                 }
 
-                // Filter data
-                // We need to preserve header but re-index Frames and Times
-                // Frame usually starts at 1? Or original?
-                // Motive usually restarts frame count if we treat it as a new take, or keeps it.
-                // User requirement: "Motiveと同様の形式で出力" "区間のデータだけを含めたCSV"
-                // Usually trimming implies new take -> Frame 0/1, Time 0.
-
-                // Let's re-index Frame to start from 1, Time to start from 0.
-
-                const frameColIdx = 0; // "Frame"
-                const timeColIdx = 1; // "Time (Seconds)"
-
-                const trimmedRows = [];
-                let newFrame = 0; // Will increment
-
-                // Need to find the rows within range
-                // Assumes rawData is sorted by time
-
-                for (const row of trimmingData.rawData) {
-                    const t = parseFloat(row[timeColIdx]);
-                    if (t >= start && t <= end) {
-                        // Clone row
-                        const newRow = [...row];
-                        newFrame++;
-                        newRow[frameColIdx] = newFrame;
-                        newRow[timeColIdx] = (t - start).toFixed(3); // Relative time
-                        trimmedRows.push(newRow);
-                    }
+                loadingDiv.classList.remove('hidden');
+                loadingText.textContent = 'CSVを出力中...';
+                try {
+                    const blob = await MocapCsv.trim(trimmingData.file, start, end);
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `trimmed_${fileNameTrimming.textContent}`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    setTimeout(() => URL.revokeObjectURL(url), 1000);
+                } catch (error) {
+                    alert(`CSVの出力に失敗しました: ${error.message}`);
+                } finally {
+                    loadingDiv.classList.add('hidden');
                 }
-
-                if (trimmedRows.length === 0) {
-                    alert('選択範囲内にデータがありません。');
-                    return;
-                }
-
-                // Construct CSV
-                // Header lines
-                const csvContent = [];
-                // Original headers
-                trimmingData.headerLines.forEach(line => {
-                    csvContent.push(line.join(','));
-                });
-
-                // Data
-                trimmedRows.forEach(row => {
-                    csvContent.push(row.join(','));
-                });
-
-                const csvString = csvContent.join('\n');
-                const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.setAttribute('href', url);
-                link.setAttribute('download', `trimmed_${fileNameTrimming.textContent}`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
             }
 
             if ('serviceWorker' in navigator) {

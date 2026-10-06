@@ -90,8 +90,47 @@ body.theater-mode .nav-link.active {
 
 /* Mobile Menu */
 #mobile-menu-overlay { transition: opacity 0.3s ease-in-out; }
-#mobile-menu-content { transition: transform 0.3s ease-in-out; }
+#mobile-menu-content {
+    transition: transform 0.3s ease-in-out;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+}
 body.mobile-menu-open { overflow: hidden; }
+
+body.theater-mode #mobile-menu-content {
+    background-color: #0f172a;
+}
+
+body.theater-mode #mobile-menu-content h1 {
+    color: #f8fafc;
+}
+
+body.theater-mode #mobile-menu-close-btn svg,
+body.theater-mode #mobile-menu-content .nav-link {
+    color: #cbd5e1;
+}
+
+body.theater-mode #mobile-menu-close-btn:hover svg {
+    color: #ffffff;
+}
+
+body.theater-mode #mobile-menu-content .nav-link:hover {
+    background-color: #1e293b;
+    color: #f8fafc;
+}
+
+body.theater-mode #mobile-menu-content .nav-link.active {
+    background-color: #334155;
+    color: #ffffff;
+    box-shadow: none;
+}
+
+#mobile-menu-content .nav-link:focus-visible,
+#mobile-menu-close-btn:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+    border-radius: 0.375rem;
+}
 
 /* Loaders */
 .loader, .download-loader {
@@ -176,7 +215,7 @@ body.theater-mode main {
 #three-canvas { display: block; width: 100%; height: 100%; }
 
 
-/* Liquid Glass Slider Tweaks */
+/* Viewer seek bar */
 input[type=range].mocap-slider {
     -webkit-appearance: none;
     background: transparent;
@@ -189,13 +228,11 @@ input[type=range].mocap-slider::-webkit-slider-thumb {
     height: 16px; width: 16px;
     border-radius: 50%;
     background: #60a5fa;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.4);
     cursor: pointer;
     margin-top: -6px;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s;
+    transition: background 0.2s;
 }
 input[type=range].mocap-slider::-webkit-slider-thumb:hover { 
-    transform: scale(1.3);
     background: #93c5fd;
 }
 input[type=range].mocap-slider::-webkit-slider-runnable-track {
@@ -207,7 +244,10 @@ input[type=range].mocap-slider::-webkit-slider-runnable-track {
 body.theater-mode input[type=range].mocap-slider::-webkit-slider-runnable-track {
     background: rgba(255, 255, 255, 0.15);
 }
-input[type=range].mocap-slider:focus { outline: none; }
+input[type=range].mocap-slider:focus-visible {
+    outline: 2px solid #60a5fa;
+    outline-offset: 3px;
+}
 
 
 /* UI Layer for 3D Viewer */
@@ -254,16 +294,33 @@ body.theater-mode .glass-sidebar h1 {
     color: #f1f5f9 !important;
 }
 
-/* Glass Button Theme for Viewer UI */
-.glass-btn {
-    background: rgba(59, 130, 246, 0.4);
-    backdrop-filter: blur(10px) saturate(150%);
-    -webkit-backdrop-filter: blur(10px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: inset 0 1px 1px rgba(255,255,255,0.3), 0 4px 6px rgba(0,0,0,0.1);
+/* Viewer controls follow the other tools' compact buttons and small corners. */
+#right-panel, #control-panel {
+    background: rgba(39, 52, 73, 0.45);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
 }
-.glass-btn:hover {
-    background: rgba(59, 130, 246, 0.6);
+#mocap-viewer .viewer-tab {
+    color: #94a3b8;
+    background: transparent;
+    border: 0;
+    border-radius: 0.375rem;
+}
+#mocap-viewer .viewer-tab:hover {
+    color: #f1f5f9;
+    background: #1e293b;
+}
+#mocap-viewer .viewer-tab[aria-pressed="true"] {
+    color: #f8fafc;
+    background: #334155;
+}
+#mocap-viewer button:focus-visible, #mocap-viewer select:focus-visible {
+    outline: 2px solid #60a5fa;
+    outline-offset: 2px;
+}
+#mocap-viewer .viewer-dropzone.is-dragging {
+    background: #334155;
 }
 
 

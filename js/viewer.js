@@ -16,6 +16,7 @@
             
             let leftover = '';
             let headerLines = [];
+            let eulerOrder = 'XYZ';
 
             function parseCSVLine(line) {
                 const result = [];
@@ -24,7 +25,8 @@
                 for (let i = 0; i < line.length; i++) {
                     const char = line[i];
                     if (char === '"') {
-                        inQuotes = !inQuotes;
+                        if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+                        else inQuotes = !inQuotes;
                     } else if (char === ',' && !inQuotes) {
                         result.push(current);
                         current = '';
@@ -113,21 +115,28 @@
                         const nameRow = headerLines[nameRowIdx];
                         const propRow = headerLines[propRowIdx];
                         const axisRow = headerLines[axisRowIdx];
+                        const idRow = headerLines.find(row => row[1] === 'ID') || [];
+                        const metadata = headerLines[0] || [];
+                        const orderIndex = metadata.indexOf('Rotation Type');
+                        if (orderIndex >= 0 && ['XYZ', 'YXZ', 'ZXY', 'ZYX', 'YZX', 'XZY'].includes(metadata[orderIndex + 1])) eulerOrder = metadata[orderIndex + 1];
 
-                        const tempObjects = {};
+                        const tempObjects = Object.create(null);
                         for (let i = 0; i < typeRow.length; i++) {
                             const type = typeRow[i] ? typeRow[i].trim() : '';
-                            if (type !== 'Rigid Body' && type !== 'Marker') continue;
+                            if (type !== 'Rigid Body' && type !== 'Marker' && type !== 'Rigid Body Marker') continue;
                             
                             const name = nameRow[i] ? nameRow[i].trim() : '';
                             const prop = propRow[i] ? propRow[i].trim() : '';
                             const axis = axisRow[i] ? axisRow[i].trim().toUpperCase() : '';
                             
-                            if (!tempObjects[name]) {
-                                tempObjects[name] = { name: name, type: type, posIdx: {}, rotIdx: {} };
+                            // Rigid Body Marker IDs identify the parent body;
+                            // marker names distinguish its individual markers.
+                            const key = JSON.stringify([type, idRow[i] || name, type === 'Rigid Body Marker' ? name : '']);
+                            if (!tempObjects[key]) {
+                                tempObjects[key] = { name: name, rawName: name, type: type === 'Rigid Body Marker' ? 'Marker' : type, posIdx: Object.create(null), rotIdx: Object.create(null) };
                             }
-                            if (prop === 'Position') tempObjects[name].posIdx[axis] = i;
-                            if (prop === 'Rotation') tempObjects[name].rotIdx[axis] = i;
+                            if (prop === 'Position') tempObjects[key].posIdx[axis] = i;
+                            if (prop === 'Rotation') tempObjects[key].rotIdx[axis] = i;
                         }
 
                         objects = Object.values(tempObjects).filter(obj => 
@@ -137,6 +146,12 @@
                             obj.hasEuler = (obj.rotIdx.X !== undefined && obj.rotIdx.W === undefined);
                             obj.hasRot = obj.hasQuat || obj.hasEuler;
                             return obj;
+                        });
+
+                        const nameCounts = Object.create(null);
+                        objects.forEach(obj => {
+                            const count = nameCounts[obj.name] = (nameCounts[obj.name] || 0) + 1;
+                            if (count > 1) obj.name += ' (' + count + ')';
                         });
 
                         numObjects = objects.length;
@@ -169,9 +184,9 @@
                         for (let objIdx = 0; objIdx < numObjects; objIdx++) {
                             const obj = objects[objIdx];
                             
-                            let px = parseFloat(row[obj.posIdx.X]); px = isNaN(px) ? 0 : px;
-                            let py = parseFloat(row[obj.posIdx.Y]); py = isNaN(py) ? 0 : py;
-                            let pz = parseFloat(row[obj.posIdx.Z]); pz = isNaN(pz) ? 0 : pz;
+                            const px = parseFloat(row[obj.posIdx.X]);
+                            const py = parseFloat(row[obj.posIdx.Y]);
+                            const pz = parseFloat(row[obj.posIdx.Z]);
                             
                             const pBase = (frameCount * numObjects + objIdx) * 3;
                             positions[pBase] = px;
@@ -195,7 +210,21 @@
                                 ry = c1 * s2 * c3 - s1 * c2 * s3;
                                 rz = c1 * c2 * s3 + s1 * s2 * c3;
                                 rw = c1 * c2 * c3 - s1 * s2 * s3;
+                                // Euler conventions from Three.js r128 Quaternion.setFromEuler.
+                                if (eulerOrder === 'YXZ') {
+                                    rz = c1 * c2 * s3 - s1 * s2 * c3; rw = c1 * c2 * c3 + s1 * s2 * s3;
+                                } else if (eulerOrder === 'ZXY') {
+                                    rx = s1 * c2 * c3 - c1 * s2 * s3; ry = c1 * s2 * c3 + s1 * c2 * s3;
+                                } else if (eulerOrder === 'ZYX') {
+                                    rx = s1 * c2 * c3 - c1 * s2 * s3; ry = c1 * s2 * c3 + s1 * c2 * s3; rz = c1 * c2 * s3 - s1 * s2 * c3; rw = c1 * c2 * c3 + s1 * s2 * s3;
+                                } else if (eulerOrder === 'YZX') {
+                                    ry = c1 * s2 * c3 + s1 * c2 * s3; rz = c1 * c2 * s3 - s1 * s2 * c3;
+                                } else if (eulerOrder === 'XZY') {
+                                    rx = s1 * c2 * c3 - c1 * s2 * s3; rw = c1 * c2 * c3 + s1 * s2 * s3;
+                                }
                             }
+                            const norm = Math.hypot(rx, ry, rz, rw);
+                            if (norm > 0) { rx /= norm; ry /= norm; rz /= norm; rw /= norm; }
                             
                             const rBase = (frameCount * numObjects + objIdx) * 4;
                             rotations[rBase] = rx;
@@ -237,7 +266,8 @@
         // 2. Main Logic & Three.js Setup
         // ==========================================
         let scene, camera, renderer, controls;
-        let animationId;
+        let animationId = null;
+        let viewerActive = document.getElementById('mocap-viewer').classList.contains('active');
         
         let playbackData = {
             objects: [],
@@ -259,8 +289,9 @@
             rbOpacity: 0.5,
             markerSize: 1.0,
             markerOpacity: 1.0,
-            trailWidth: 2,
-            trailOpacity: 0.8
+            rbTrailWidth: 3,
+            markerTrailWidth: 0.5,
+            trailOpacity: 0.5
         };
 
         let isPlaying = false;
@@ -314,12 +345,12 @@
         function initThreeJS() {
             const canvas = document.getElementById('three-canvas');
             const container = document.getElementById('playback-viewer');
-            const w = container ? container.clientWidth : window.innerWidth;
-            const h = container ? container.clientHeight : window.innerHeight;
+            const w = Math.max(1, container ? container.clientWidth : window.innerWidth);
+            const h = Math.max(1, container ? container.clientHeight : window.innerHeight);
             
             renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
             renderer.setSize(w, h);
-            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x111827);
@@ -340,19 +371,42 @@
             scene.add(gridHelper);
 
             window.addEventListener('resize', onWindowResize);
-            animateLoop();
+            window.addEventListener('mocap-pagechange', ({ detail }) => {
+                viewerActive = detail.pageId === 'mocap-viewer';
+                syncViewerRendering();
+            });
+            document.addEventListener('visibilitychange', syncViewerRendering);
+            syncViewerRendering();
+        }
+
+        function syncViewerRendering() {
+            if (viewerActive && !document.hidden) {
+                onWindowResize();
+                lastRealTime = performance.now();
+                if (animationId === null) animationId = requestAnimationFrame(animateLoop);
+            } else {
+                if (animationId !== null) cancelAnimationFrame(animationId);
+                animationId = null;
+                tooltip.classList.add('hidden');
+            }
         }
 
         function onWindowResize() {
+            if (!viewerActive || document.hidden) return;
             const container = document.getElementById('playback-viewer');
-            const w = container ? container.clientWidth : window.innerWidth;
-            const h = container ? container.clientHeight : window.innerHeight;
+            const w = Math.max(1, container ? container.clientWidth : window.innerWidth);
+            const h = Math.max(1, container ? container.clientHeight : window.innerHeight);
             camera.aspect = w / h;
             camera.updateProjectionMatrix();
             renderer.setSize(w, h);
+            playbackData.trails.forEach(trail => {
+                trail.material.resolution.set(w, h);
+            });
         }
 
         function animateLoop(time) {
+            animationId = null;
+            if (!viewerActive || document.hidden) return;
             animationId = requestAnimationFrame(animateLoop);
             
             if (isPlaying && playbackData.frameCount > 0) {
@@ -389,11 +443,11 @@
 
         function setupEventListeners() {
             const dropZone = document.getElementById('drop-zone');
-            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-blue-500', 'bg-gray-800'); });
-            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-blue-500', 'bg-gray-800'));
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('is-dragging'); });
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('is-dragging'));
             dropZone.addEventListener('drop', (e) => {
                 e.preventDefault();
-                dropZone.classList.remove('border-blue-500', 'bg-gray-800');
+                dropZone.classList.remove('is-dragging');
                 if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
             });
 
@@ -434,11 +488,8 @@
 
             // Tabs UI
             tabBtnList.addEventListener('click', () => {
-                tabBtnList.classList.add('text-blue-400', 'border-blue-500', 'bg-gray-800/50');
-                tabBtnList.classList.remove('text-gray-400', 'hover:text-gray-200', 'bg-gray-800/20', 'hover:bg-gray-800/50', 'border-transparent');
-                
-                tabBtnSettings.classList.add('text-gray-400', 'hover:text-gray-200', 'bg-gray-800/20', 'hover:bg-gray-800/50', 'border-transparent');
-                tabBtnSettings.classList.remove('text-blue-400', 'border-blue-500', 'bg-gray-800/50');
+                tabBtnList.setAttribute('aria-pressed', 'true');
+                tabBtnSettings.setAttribute('aria-pressed', 'false');
 
                 tabContentList.classList.remove('hidden');
                 tabContentList.classList.add('flex');
@@ -447,11 +498,8 @@
             });
 
             tabBtnSettings.addEventListener('click', () => {
-                tabBtnSettings.classList.add('text-blue-400', 'border-blue-500', 'bg-gray-800/50');
-                tabBtnSettings.classList.remove('text-gray-400', 'hover:text-gray-200', 'bg-gray-800/20', 'hover:bg-gray-800/50', 'border-transparent');
-                
-                tabBtnList.classList.add('text-gray-400', 'hover:text-gray-200', 'bg-gray-800/20', 'hover:bg-gray-800/50', 'border-transparent');
-                tabBtnList.classList.remove('text-blue-400', 'border-blue-500', 'bg-gray-800/50');
+                tabBtnSettings.setAttribute('aria-pressed', 'true');
+                tabBtnList.setAttribute('aria-pressed', 'false');
 
                 tabContentSettings.classList.remove('hidden');
                 tabContentSettings.classList.add('flex');
@@ -460,16 +508,16 @@
             });
 
             // Settings Sliders
-            const settingKeys = ['rb-size', 'rb-opacity', 'marker-size', 'marker-opacity', 'trail-width', 'trail-opacity'];
+            const settingKeys = ['rb-size', 'rb-opacity', 'marker-size', 'marker-opacity', 'rb-trail-width', 'marker-trail-width', 'trail-opacity'];
             settingKeys.forEach(key => {
                 const el = document.getElementById(`set-${key}`);
                 const valEl = document.getElementById(`val-${key}`);
                 el.addEventListener('input', (e) => {
                     const v = parseFloat(e.target.value);
-                    valEl.textContent = key.includes('size') ? v.toFixed(1) + 'x' : (key === 'trail-width' ? v + 'px' : v.toFixed(1));
+                    valEl.textContent = key.includes('size') ? v.toFixed(1) + 'x' : (key.endsWith('-width') ? v + 'px' : v.toFixed(1));
                     
                     const parts = key.split('-');
-                    const objKey = parts[0] + parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
+                    const objKey = parts.map((part, i) => i === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)).join('');
                     globalSettings[objKey] = v;
                     
                     applySettingsToMaterials();
@@ -478,6 +526,7 @@
 
             // Raycaster Mouse Update
             window.addEventListener('pointermove', (event) => {
+                if (!viewerActive || document.hidden) return;
                 const canvas = renderer.domElement;
                 let rect = null;
                 if (canvas) {
@@ -519,9 +568,11 @@
                 lastRealTime = performance.now();
                 iconPlay.classList.add('hidden');
                 iconPause.classList.remove('hidden');
+                btnPlay.setAttribute('aria-label', '一時停止');
             } else {
                 iconPlay.classList.remove('hidden');
                 iconPause.classList.add('hidden');
+                btnPlay.setAttribute('aria-label', '再生');
             }
         }
 
@@ -529,7 +580,7 @@
             loadingStatus.textContent = 'エラーが発生しました';
             loadingStatus.classList.add('text-red-500');
             progressBar.classList.replace('bg-blue-500', 'bg-red-500');
-            errorDetails.innerHTML = `<span class="font-bold text-red-400">詳細:</span> ${msg}`;
+            errorDetails.innerHTML = `<span class="font-bold text-red-400">詳細:</span> ${MocapCsv.escapeHtml(msg)}`;
             btnReset.classList.remove('hidden');
         }
 
@@ -546,12 +597,11 @@
                 }
                 if(playbackData.trails[rbIdx]) {
                     playbackData.trails[rbIdx].material.opacity = globalSettings.trailOpacity;
-                    playbackData.trails[rbIdx].material.linewidth = globalSettings.trailWidth;
+                    playbackData.trails[rbIdx].material.linewidth = globalSettings.rbTrailWidth;
                 }
                 
                 if (playbackData.markerLineSegments[rbIdx]) {
                     playbackData.markerLineSegments[rbIdx].material.opacity = globalSettings.trailOpacity;
-                    playbackData.markerLineSegments[rbIdx].material.linewidth = globalSettings.trailWidth; 
                 }
             });
 
@@ -562,7 +612,7 @@
                 }
                 if(playbackData.trails[mIdx]) {
                     playbackData.trails[mIdx].material.opacity = globalSettings.trailOpacity;
-                    playbackData.trails[mIdx].material.linewidth = globalSettings.trailWidth;
+                    playbackData.trails[mIdx].material.linewidth = globalSettings.markerTrailWidth;
                 }
             });
             updateSceneState();
@@ -598,12 +648,12 @@
                     
                     tooltip.innerHTML = `
                         <div class="font-bold border-b border-gray-600 pb-1 mb-1 flex items-center justify-between gap-4">
-                            <span>${obj.name}</span>
+                            <span>${MocapCsv.escapeHtml(obj.name)}</span>
                             <span class="text-[10px] bg-gray-700 px-1.5 py-0.5 rounded text-gray-300 uppercase">${obj.type}</span>
                         </div>
-                        <div class="text-xs text-gray-300 font-mono"><span class="text-gray-400">Time:</span> ${timeStr}</div>
-                        <div class="text-xs text-gray-300 font-mono mt-1"><span class="text-gray-400">Pos:</span> X:${p.x.toFixed(3)} Y:${p.y.toFixed(3)} Z:${p.z.toFixed(3)}</div>
-                        <div class="text-xs text-gray-300 font-mono"><span class="text-gray-400">Rot:</span> X:${(euler.x*180/Math.PI).toFixed(1)}° Y:${(euler.y*180/Math.PI).toFixed(1)}° Z:${(euler.z*180/Math.PI).toFixed(1)}°</div>
+                        <div class="text-xs text-gray-300 tabular-nums"><span class="text-gray-400">Time:</span> ${timeStr}</div>
+                        <div class="text-xs text-gray-300 tabular-nums mt-1"><span class="text-gray-400">Pos:</span> X:${p.x.toFixed(3)} Y:${p.y.toFixed(3)} Z:${p.z.toFixed(3)}</div>
+                        <div class="text-xs text-gray-300 tabular-nums"><span class="text-gray-400">Rot:</span> X:${(euler.x*180/Math.PI).toFixed(1)}° Y:${(euler.y*180/Math.PI).toFixed(1)}° Z:${(euler.z*180/Math.PI).toFixed(1)}°</div>
                     `;
                     tooltip.classList.remove('hidden');
                     return;
@@ -659,9 +709,9 @@
                     progressPct.textContent = '100';
                     progressBar.style.width = '100%';
                     setTimeout(() => {
-                        buildScene(msg);
-                        worker.terminate();
-                        URL.revokeObjectURL(workerUrl); 
+                        try { buildScene(msg); }
+                        catch (error) { showAppError(error.message); }
+                        finally { worker.terminate(); URL.revokeObjectURL(workerUrl); }
                     }, 100); 
                 } else if (msg.type === 'error') {
                     showAppError(msg.message);
@@ -694,12 +744,15 @@
 
             reader.onerror = function() {
                 showAppError('ファイルの読み込み中にブラウザエラーが発生しました。');
+                worker.terminate();
+                URL.revokeObjectURL(workerUrl);
             };
 
             readNextChunk(); 
         }
 
         function buildScene(data) {
+            disposeSceneResources();
             playbackData = data;
             playbackData.numObjects = data.objects.length;
             duration = data.times[data.frameCount - 1];
@@ -716,7 +769,7 @@
             dirLight.position.set(10, 20, 10);
             scene.add(dirLight);
 
-            const colors = [0x3b82f6, 0xef4444, 0x10b981, 0xf97316, 0x8b5cf6, 0xf59e0b, 0x14b8a6, 0xec4899];
+            const colors = ['#3b82f6', '#ef4444', '#10b981', '#f97316', '#8b5cf6', '#f59e0b', '#14b8a6', '#ec4899', '#06b6d4', '#84cc16', '#facc15', '#d946ef'];
             playbackData.meshes = [];
             playbackData.trails = [];
             playbackData.markerLineSegments = [];
@@ -737,7 +790,7 @@
                 const marker = data.objects[idx];
                 let parentIdx = -1;
                 for (let rbIdx of playbackData.rigidBodyIndices) {
-                    const rbName = data.objects[rbIdx].name;
+                    const rbName = data.objects[rbIdx].rawName || data.objects[rbIdx].name;
                     if (marker.name.startsWith(rbName + '_') || marker.name.startsWith(rbName + ':')) {
                         parentIdx = rbIdx;
                         break;
@@ -745,7 +798,7 @@
                 }
                 if (parentIdx === -1) {
                     for (let rbIdx of playbackData.rigidBodyIndices) {
-                        const rbName = data.objects[rbIdx].name;
+                        const rbName = data.objects[rbIdx].rawName || data.objects[rbIdx].name;
                         if (marker.name.startsWith(rbName)) {
                             parentIdx = rbIdx;
                             break;
@@ -758,14 +811,24 @@
                 }
             });
 
-            const bbox = new THREE.Box3();
+            // Assign colors by rigid-body order, independent of marker count.
+            const objectColors = new Array(data.objects.length);
+            playbackData.rigidBodyIndices.forEach((idx, order) => {
+                objectColors[idx] = colors[order % colors.length];
+            });
+            playbackData.markerIndices.forEach((idx, order) => {
+                const parentIdx = data.objects[idx].parentRbIdx;
+                objectColors[idx] = parentIdx !== -1 ? objectColors[parentIdx] : colors[order % colors.length];
+            });
 
+            const bbox = new THREE.Box3();
+            const position = new THREE.Vector3();
             for (let i = 0; i < data.positions.length; i += 3) {
                 const x = data.positions[i];
                 const y = data.positions[i+1];
                 const z = data.positions[i+2];
-                if (x !== 0 || y !== 0 || z !== 0) { 
-                    bbox.expandByPoint(new THREE.Vector3(x, y, z));
+                if (Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(z)) {
+                    bbox.expandByPoint(position.set(x, y, z));
                 }
             }
 
@@ -775,17 +838,10 @@
 
             objectListContainer.innerHTML = '';
             rightPanel.classList.add('flex'); rightPanel.classList.remove('hidden');
+            const trailResolution = renderer.getSize(new THREE.Vector2());
 
             data.objects.forEach((obj, i) => {
-                let colorHex;
-                if (obj.type === 'Rigid Body') {
-                    colorHex = colors[i % colors.length];
-                } else if (obj.parentRbIdx !== -1) {
-                    colorHex = colors[obj.parentRbIdx % colors.length];
-                } else {
-                    colorHex = colors[i % colors.length]; 
-                }
-
+                const colorHex = objectColors[i];
                 const color = new THREE.Color(colorHex);
                 const group = new THREE.Group();
                 
@@ -823,39 +879,42 @@
                     group.add(mesh);
                 }
 
-                // 標準のTHREE.Lineによる軌跡の作成 (NaNで切断)
+                // Independent segments leave tracking gaps open without NaN geometry.
                 const trailPoints = [];
+                const trailEndFrames = [];
                 const step = Math.max(1, Math.floor(data.frameCount / 2000));
-                let wasValid = false;
+                let previous = null;
                 
                 for(let f = 0; f < data.frameCount; f += step) {
                     const pBase = (f * playbackData.numObjects + i) * 3;
                     const v = new THREE.Vector3(data.positions[pBase], data.positions[pBase+1], data.positions[pBase+2]);
                     
-                    if(v.lengthSq() > 0.0001) {
-                         trailPoints.push(v);
-                         wasValid = true;
+                    if (Number.isFinite(v.x) && Number.isFinite(v.y) && Number.isFinite(v.z)) {
+                        if (previous) { trailPoints.push(previous, v); trailEndFrames.push(f); }
+                        previous = v;
                     } else {
-                        // トラッキングがロストした部分は線を切るためにNaNを入れる
-                        if (wasValid) {
-                            trailPoints.push(new THREE.Vector3(NaN, NaN, NaN));
-                            wasValid = false;
-                        }
+                        previous = null;
                     }
                 }
                 
-                const trailGeo = new THREE.BufferGeometry().setFromPoints(trailPoints);
-                const trailMat = new THREE.LineBasicMaterial({ 
+                const trailPositions = new Float32Array(trailPoints.length * 3);
+                trailPoints.forEach((point, idx) => point.toArray(trailPositions, idx * 3));
+                const trailGeo = new THREE.LineSegmentsGeometry().setPositions(trailPositions);
+                trailGeo.instanceCount = trailEndFrames.length;
+                const trailMat = new THREE.LineMaterial({
                     color: color, 
                     transparent: true, 
                     opacity: globalSettings.trailOpacity,
-                    linewidth: globalSettings.trailWidth
+                    depthWrite: false,
+                    linewidth: obj.type === 'Rigid Body' ? globalSettings.rbTrailWidth : globalSettings.markerTrailWidth,
+                    resolution: trailResolution
                 });
                 
-                const trailObj = new THREE.Line(trailGeo, trailMat);
+                const trailObj = new THREE.LineSegments2(trailGeo, trailMat);
                 // 追従モードの計算用に保存
                 trailObj.userData.step = step;
                 trailObj.userData.maxPoints = trailPoints.length;
+                trailObj.userData.endFrames = Uint32Array.from(trailEndFrames);
 
                 scene.add(group);
                 scene.add(trailObj);
@@ -867,7 +926,7 @@
             // 剛体ごとにマーカー間を結ぶLineSegmentsを作成
             playbackData.rigidBodyIndices.forEach(rbIdx => {
                 const obj = data.objects[rbIdx];
-                const colorHex = colors[rbIdx % colors.length];
+                const colorHex = objectColors[rbIdx];
                 const numMarkers = obj.childMarkers.length;
                 
                 if (numMarkers > 1) {
@@ -878,8 +937,7 @@
                     const lineMat = new THREE.LineBasicMaterial({ 
                         color: colorHex, 
                         transparent: true, 
-                        opacity: globalSettings.trailOpacity,
-                        linewidth: globalSettings.trailWidth
+                        opacity: globalSettings.trailOpacity
                     });
                     const lineSegments = new THREE.LineSegments(lineGeo, lineMat);
                     scene.add(lineSegments);
@@ -889,10 +947,10 @@
 
             playbackData.rigidBodyIndices.forEach(idx => {
                 const obj = data.objects[idx];
-                const colorHex = colors[idx % colors.length];
+                const colorHex = objectColors[idx];
                 
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'flex items-center gap-3 bg-gray-800/80 hover:bg-gray-700/80 p-2 rounded transition cursor-pointer';
+                itemDiv.className = 'flex items-center gap-3 bg-slate-800/10 hover:bg-slate-700/40 p-2 rounded-md transition-colors cursor-pointer';
                 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
@@ -991,8 +1049,8 @@
                 const px = positions[p1Idx] + (positions[p2Idx] - positions[p1Idx]) * ratio;
                 const py = positions[p1Idx+1] + (positions[p2Idx+1] - positions[p1Idx+1]) * ratio;
                 const pz = positions[p1Idx+2] + (positions[p2Idx+2] - positions[p1Idx+2]) * ratio;
-                
-                group.position.set(px, py, pz);
+                group.userData.positionValid = Number.isFinite(px) && Number.isFinite(py) && Number.isFinite(pz);
+                group.position.set(group.userData.positionValid ? px : 0, group.userData.positionValid ? py : 0, group.userData.positionValid ? pz : 0);
 
                 const r1Idx = (idx1 * numObjects + i) * 4;
                 const r2Idx = (idx2 * numObjects + i) * 4;
@@ -1010,15 +1068,29 @@
                 const group = meshes[i];
                 
                 const pIdx = (idx * numObjects + i) * 3;
-                group.position.set(positions[pIdx], positions[pIdx+1], positions[pIdx+2]);
+                const x = positions[pIdx], y = positions[pIdx + 1], z = positions[pIdx + 2];
+                group.userData.positionValid = Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(z);
+                group.position.set(group.userData.positionValid ? x : 0, group.userData.positionValid ? y : 0, group.userData.positionValid ? z : 0);
+                currentFrameIdx = idx;
                 
                 const rIdx = (idx * numObjects + i) * 4;
                 group.quaternion.set(rotations[rIdx], rotations[rIdx+1], rotations[rIdx+2], rotations[rIdx+3]);
             }
         }
 
+        function visibleTrailVertices(trail, frame) {
+            const frames = trail.userData.endFrames;
+            let low = 0, high = frames.length;
+            while (low < high) {
+                const mid = (low + high) >>> 1;
+                if (frames[mid] <= frame) low = mid + 1;
+                else high = mid;
+            }
+            return low * 2;
+        }
+
         function updateSceneState() {
-            if (!playbackData || playbackData.numObjects === 0) return;
+            if (!playbackData || !playbackData.frameCount || !playbackData.numObjects) return;
 
             const showRb = toggleRb.checked;
             const showMarker = toggleMarker.checked;
@@ -1045,7 +1117,7 @@
                 
                 if (isRbChecked) anySelected = true;
                 
-                const rbIsMissing = rbGroup.position.lengthSq() < 0.0001;
+                const rbIsMissing = rbGroup.userData.positionValid === false;
 
                 // 剛体の表示制御
                 rbGroup.visible = isRbChecked && showRb && !rbIsMissing;
@@ -1059,17 +1131,17 @@
                     trail.visible = isRbChecked && showRbTrail;
                     
                     if (isFollow) {
-                        const count = Math.floor(currentFrameIdx / trail.userData.step) + 1;
-                        trail.geometry.setDrawRange(0, count);
+                        const count = visibleTrailVertices(trail, currentFrameIdx);
+                        trail.geometry.instanceCount = count / 2;
                     } else {
-                        trail.geometry.setDrawRange(0, Infinity);
+                        trail.geometry.instanceCount = trail.userData.endFrames.length;
                     }
                 }
 
                 const validMarkerPositions = [];
                 rbObj.childMarkers.forEach(mIdx => {
                     const mGroup = playbackData.meshes[mIdx];
-                    const mIsMissing = mGroup.position.lengthSq() < 0.0001;
+                    const mIsMissing = mGroup.userData.positionValid === false;
                     
                     // マーカーの表示制御
                     mGroup.visible = isRbChecked && showMarker && !mIsMissing;
@@ -1083,10 +1155,10 @@
                         mTrail.visible = isRbChecked && showMarkerTrail;
                         
                         if (isFollow) {
-                            const count = Math.floor(currentFrameIdx / mTrail.userData.step) + 1;
-                            mTrail.geometry.setDrawRange(0, count);
+                            const count = visibleTrailVertices(mTrail, currentFrameIdx);
+                            mTrail.geometry.instanceCount = count / 2;
                         } else {
-                            mTrail.geometry.setDrawRange(0, Infinity);
+                            mTrail.geometry.instanceCount = mTrail.userData.endFrames.length;
                         }
                     }
 
@@ -1122,7 +1194,7 @@
             playbackData.markerIndices.forEach(mIdx => {
                 if (playbackData.objects[mIdx].parentRbIdx === -1) {
                     const mGroup = playbackData.meshes[mIdx];
-                    const mIsMissing = mGroup.position.lengthSq() < 0.0001;
+                    const mIsMissing = mGroup.userData.positionValid === false;
                     
                     mGroup.visible = showMarker && showUnassignedMarker && !mIsMissing; 
                     if (mGroup.children[0]) mGroup.children[0].scale.set(markerScale, markerScale, markerScale);
@@ -1132,10 +1204,10 @@
                         trail.visible = showMarkerTrail && showUnassignedMarker;
                         
                         if (isFollow) {
-                            const count = Math.floor(currentFrameIdx / trail.userData.step) + 1;
-                            trail.geometry.setDrawRange(0, count);
+                            const count = visibleTrailVertices(trail, currentFrameIdx);
+                            trail.geometry.instanceCount = count / 2;
                         } else {
-                            trail.geometry.setDrawRange(0, Infinity);
+                            trail.geometry.instanceCount = trail.userData.endFrames.length;
                         }
                     }
                 }
@@ -1151,6 +1223,18 @@
             }
         }
 
+        function disposeSceneResources() {
+            const geometries = new Set(), materials = new Set();
+            scene.traverse(object => {
+                if (object.geometry) geometries.add(object.geometry);
+                if (object.material) {
+                    for (const material of (Array.isArray(object.material) ? object.material : [object.material])) materials.add(material);
+                }
+            });
+            geometries.forEach(geometry => geometry.dispose());
+            materials.forEach(material => material.dispose());
+        }
+
         function resetApp() {
             currentTime = 0;
             currentFrameIdx = 0;
@@ -1159,7 +1243,8 @@
             tooltip.classList.add('hidden');
             noSelectionHint.classList.add('hidden');
             
-            playbackData = { frameCount: 0 };
+            disposeSceneResources();
+            playbackData = { objects: [], numObjects: 0, frameCount: 0, times: null, positions: null, rotations: null, meshes: [], trails: [], markerLineSegments: [], rigidBodyIndices: [], markerIndices: [] };
             while(scene.children.length > 0){ scene.remove(scene.children[0]); }
             const gridHelper = new THREE.GridHelper(10, 20, 0x4b5563, 0x374151);
             scene.add(gridHelper);
@@ -1175,4 +1260,3 @@
             controls.target.set(0, 0, 0);
             controls.update();
         }
-
